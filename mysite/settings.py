@@ -76,15 +76,20 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.mysql',
+    #    'NAME': 'dental',
+    #    'USER': 'root',
+    #    'PASSWORD': '',
+    #    'HOST': 'localhost',
+    #    'PORT': ''
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'dental',
-        
-        
+        'NAME': 'libreria',
         'USER': 'root',
-        'PASSWORD': '1234',
+        'PASSWORD': '',
         'HOST': 'localhost',
-        'PORT': ''
+        'PORT': '3306'
     }
 }
 
