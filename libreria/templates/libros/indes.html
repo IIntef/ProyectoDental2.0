@@ -35,7 +35,24 @@
                             <td>Django con Python</td>
                             <td>Foto</td>
                             <td>Profundizado en Programación</td>
-                            <td>Editar | Borrar</td>
+                            <td><a
+                                name=""
+                                id=""
+                                class="btn btn-info"
+                                href="{% url 'editar' %}"
+                                role="button"
+                                >Editar</a
+                            >
+                            <a
+                                name=""
+                                id=""
+                                class="btn btn-danger"
+                                href="{% url 'crear' %}"
+                                role="button"
+                                >Borrar</a
+                            >
+                            
+                            </td>
                         </tr>
                     </tbody>
                 </table>
