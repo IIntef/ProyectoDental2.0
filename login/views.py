@@ -3,9 +3,25 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.db import IntegrityError
-from .models import UserProfile
+from .models import *
 from django.contrib.auth.decorators import login_required
 
+def newhistoriaclinica(request):
+    if request.method == 'POST':
+        try:
+            user = Valoracion.objects.create(
+                tipo=request.POST['type'],
+                numero=request.POST['numero'],
+                username=request.POST['username'],
+                email=request.POST['email'],
+            )
+            user.save()
+            success_message = 'Cuenta Creada Correctamente, Por favor inicie sesión'
+        except IntegrityError as e:
+            if 'unique constraint' in str(e):
+                error_message = 'El usuario ya fue creado'
+            else:
+                error_message = f'Error al crear el usuario: {e}'
 
 def registrarme(request):
     error_message = None

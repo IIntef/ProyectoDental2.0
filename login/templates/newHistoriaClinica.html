@@ -12,55 +12,53 @@ Nueva Historia Clínica
     <div class="historia">
       <form action="" method="POST">
         {% csrf_token %}
-        
         <div class="seccion">
           <h4>Datos Básicos</h4>
           <div class="grid-container">
-            <div class="grid-item"><label>Dirección:</label><input type="number" placeholder="No. Documento" required/></div>
-            <div class="grid-item"><label>Teléfono:</label><input type="number" placeholder="Teléfono" required/></div>
-            <div class="grid-item"><label>Paciente:</label><input type="text" placeholder="Nombre del paciente" required/></div>
-            <div class="grid-item"><label>Identificación:</label><input type="number" placeholder="Número de identificación" required/></div>
-            <div class="grid-item"><label>Edad:</label><input type="number" placeholder="Edad" required/></div>
-            <div class="grid-item"><label>Ocupación:</label><input type="text" placeholder="Ocupación" required/></div>
-            <div class="grid-item"><label>Celular:</label><input type="number" placeholder="Número de celular" required/></div>
-            <div class="grid-item"><label>Fecha de Ingreso:</label><input type="date" required/></div>
-            <div class="grid-item"><label>Acudiente:</label><input type="text" placeholder="Nombre del acudiente" required/></div>
+            <div class="grid-item"><label>Dirección:</label><input type="number" id="" name="" placeholder="No. Documento" required/></div>
+            <div class="grid-item"><label>Paciente:</label><input type="text" id="" name="" placeholder="Nombre del paciente" required/></div>
+            <div class="grid-item"><label>Identificación:</label><input type="number" id="" name="" placeholder="Número de identificación" required/></div>
+            <div class="grid-item"><label>Edad:</label><input type="number" id="" name="" placeholder="Edad" required/></div>
+            <div class="grid-item"><label>Ocupación:</label><input type="text" id="" name="" placeholder="Ocupación" required/></div>
+            <div class="grid-item"><label>Celular:</label><input type="number" id="" name="" placeholder="Número de celular" required/></div>
+            <div class="grid-item"><label>Fecha de Ingreso:</label><input type="date" id="" name="" required/></div>
+            <div class="grid-item"><label>Acudiente:</label><input type="text" id="" name="" placeholder="Nombre del acudiente" required/></div>
           </div>
         </div>
         
         <div class="seccion">
           <h4>Anamnesis</h4>
           <div class="grid-container">
-            <div class="grid-item"><label>Tratamiento con Medicación:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Reacciones Alérgicas:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Trastorno de la Tensión Arterial:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Diabetes:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Trastornos Emocionales:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Enfermedad Respiratoria:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Otros:</label><input type="text" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Tratamiento con Medicación:</label><input type="text" id="tratamiento_medicacion" name="tratamiento_medicacion" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Reacciones Alérgicas:</label><input type="text" id="reacciones_alergicas" name="reacciones_alergicas" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Trastorno de la Tensión Arterial:</label><input type="text" id="transtorno_tension_arterial" name="transtorno_tension_arterial" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Diabetes:</label><input type="text" id="diabetes" name="diabetes" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Trastornos Emocionales:</label><input type="text" id="transtornos_emocionales" name="transtornos_emocionales" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Enfermedad Respiratoria:</label><input type="text" id="enfermedad_respiratoria" name="enfermedad_respiratoria" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Otros:</label><input type="text" id="otros" name="otros" placeholder="Especifique" required/></div>
           </div>
         </div>
         
         <div class="seccion">
           <h4>Rehabilitación Oral</h4>
           <div class="grid-container">
-            <div class="grid-item"><label>Prótesis Dental:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Total:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Acrílico:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Flexible:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Parcial:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Retenedores:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Panorámica:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Periapical:</label><input type="text" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Prótesis Dental:</label><input type="text" id="protesis_dental" name="protesis_dental" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Total:</label><input type="text" id="total" name="total" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Acrílico:</label><input type="text" id="acrilico" name="acrilico" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Flexible:</label><input type="text" id="flexible" name="flexible" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Parcial:</label><input type="text" id="parcial" name="parcial" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Retenedores:</label><input type="text" id="retenedores" name="retenedores" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Panorámica:</label><input type="text" id="panoramica" name="panoramica" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Periapical:</label><input type="text" id="periapical" name="periapical" placeholder="Especifique" required/></div>
           </div>
         </div>
         
         <div class="seccion">
           <h4>Higiene Oral</h4>
           <div class="grid-container">
-            <div class="grid-item"><label>Cepillado Dental:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Seda Dental:</label><input type="text" placeholder="Especifique" required/></div>
-            <div class="grid-item"><label>Enjuague Bucal:</label><input type="text" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Cepillado Dental:</label><input type="text" id="cepillado_dental" name="cepillado_dental" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Seda Dental:</label><input type="text" id="seda_dental" name="seda_dental" placeholder="Especifique" required/></div>
+            <div class="grid-item"><label>Enjuague Bucal:</label><input type="text" id="enjuague_bucal" name="enjuague_bucal" placeholder="Especifique" required/></div>
           </div>
         </div>
 

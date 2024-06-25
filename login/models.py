@@ -5,7 +5,6 @@ class UserProfileManager(BaseUserManager):
     def create_user(self, numero, username, email, password=None, tipo=2):
         if not numero:
             raise ValueError('Users must have a document number')
-
         if not email:
             raise ValueError('Users must have an email address')
 
@@ -15,7 +14,6 @@ class UserProfileManager(BaseUserManager):
             email=self.normalize_email(email),
             tipo=tipo
         )
-
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -35,22 +33,27 @@ class UserProfileManager(BaseUserManager):
         return user
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
-    tipo_choices = (
+    TIPO_CHOICES = (
         (1, 'T.I'),
         (2, 'C.C'),
         (3, 'C.E'),
         (4, 'C.I'),
     )
 
-    tipo = models.PositiveSmallIntegerField(choices=tipo_choices, default=2)
+    tipo = models.PositiveSmallIntegerField(choices=TIPO_CHOICES, default=2)
     numero = models.PositiveIntegerField(unique=True)
     username = models.CharField(max_length=50)
-    email = models.EmailField(max_length=100, unique=True)
-
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+    
+    email = models.EmailField(max_length=100, null=True, blank=True)
+    ocupacion = models.CharField(max_length=50, null=True, blank=True)
+    celular = models.CharField(max_length=15, null=True, blank=True)  # Changed to CharField
+    fecha_ingreso = models.DateField(null=True, blank=True)  # Changed to snake_case
+    acudiente = models.CharField(max_length=50, null=True, blank=True)  # Changed default to blank=True
+    edad = models.PositiveSmallIntegerField(null=True, blank=True)
+    is_active = models.BooleanField(default=True, null=True, blank=True)
+    is_staff = models.BooleanField(default=False, null=True, blank=True)
+    is_admin = models.BooleanField(default=False, null=True, blank=True)
+    is_superuser = models.BooleanField(default=False, null=True, blank=True)
 
     objects = UserProfileManager()
 
@@ -60,12 +63,40 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return str(self.numero)
 
-class UserAddress(models.Model):
-    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
-    street = models.CharField(max_length=100)
-    city = models.CharField(max_length=50)
-    state = models.CharField(max_length=50)
-    postal_code = models.CharField(max_length=10)
+class Valoracion(models.Model):  # Changed to PascalCase
+    OPCIONES_SI_NO_NO_SABE = (
+        (1, 'SI'),
+        (2, 'NO'),
+        (3, 'NO SABE'),
+    )
+    OPCIONES_SI_NO = (
+        (1, 'SI'),
+        (2, 'NO'),
+    )
+
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)  # Added ForeignKey to UserProfile
+    tratamiento_medicacion = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO_NO_SABE, default=3)
+    reacciones_alergicas = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO_NO_SABE, default=3)
+    transtorno_tension_arterial = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO_NO_SABE, default=3)
+    diabetes = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO_NO_SABE, default=3)
+    transtornos_emocionales = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO_NO_SABE, default=3)
+    enfermedad_respiratoria = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO_NO_SABE, default=3)
+    otros = models.CharField(max_length=100, blank=True)
+
+    protesis_dental = models.CharField(max_length=100, blank=True)
+    total = models.CharField(max_length=100, blank=True)
+    acrilico = models.CharField(max_length=100, blank=True)
+    flexible = models.CharField(max_length=100, blank=True)
+    parcial = models.CharField(max_length=100, blank=True)
+    retenedores = models.CharField(max_length=100, blank=True)
+
+    panoramica = models.CharField(max_length=100, blank=True)
+    periapical = models.CharField(max_length=100, blank=True)
+
+    cepillado_dental = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO)
+    seda_dental = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO)
+    enjuague_bucal = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO)
 
     def __str__(self):
-        return f"{self.user.username}'s Address"
+        return f"{self.user.username}'s Valoracion"
+    
