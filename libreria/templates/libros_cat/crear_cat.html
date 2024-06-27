@@ -1,0 +1,15 @@
+{% extends "bass.html" %}
+
+{% block titulo %} CREAR CATEGORIA {% endblock %}
+
+{% block contenido %}
+<div class="card">
+    <div class="card-header">Crear una Categoria</div>
+    <div class="card-body">
+        <h4 class="card-title">Información</h4>
+        {% include 'libros_cat/forms_cat.html' %}
+    </div>
+    <div class="card-footer text-muted">Footer</div>
+</div>
+
+{% endblock %}

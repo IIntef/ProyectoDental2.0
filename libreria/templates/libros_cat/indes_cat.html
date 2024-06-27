@@ -8,12 +8,12 @@
             <a name="" 
             id="" 
             class="btn btn-success"  
-            href="{% url 'crear' %}"
+            href="{% url 'crear_cat' %}"
             role="button">
-            Agregar nuevo libro </a>
+            Agregar Nueva Categoria </a>
         </div>
         <div class="card-body">
-            <h4 class="card-title">Libros</h4>
+            <h4 class="card-title">Categorias</h4>
             <div
                 class="table-responsive"
             >
@@ -23,27 +23,20 @@
                     <thead>
                         <tr>
                             <th scope="col">Id</th>
-                            <th scope="col">Titulo</th>
-                            <th scope="col">Imagen</th>
-                            <th scope="col">Descripción</th>
+                            <th scope="col">Nombre</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr class="">
-                            {% for libro in libros %}
+                            {% for Categoria in categorias %}
                             <tr class="">
-                                <td>{{ libro.id }}</td>
-                                <td>{{ libro.titulo }}</td>
-                                <td>
-                                    <img src="{{ libro.imagen.url }}" height="100">
-                                </td>
-                                <td>{{ libro.descripcion}}</td>
+                                <td>{{ Categoria.id }}</td>
                                 <td><a
                                     name=""
                                     id=""
                                     class="btn btn-info"
-                                    href="{% url 'editar' libro.id %}"
+                                    href="{% url 'editar' Categoria.id %}"
                                     role="button"
                                     >Editar</a
                                 >
@@ -51,7 +44,7 @@
                                 name=""
                                 id=""
                                 class="btn btn-danger"
-                                href="{% url 'eliminar' libro.id %}"
+                                href="{% url 'eliminar' Categoria.id %}"
                                 role="button"
                                 >Borrar</a
                             >
