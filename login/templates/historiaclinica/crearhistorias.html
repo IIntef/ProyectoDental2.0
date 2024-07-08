@@ -1,0 +1,15 @@
+{% extends "bass.html" %}
+
+{% block titulo %} CREAR LIBRO {% endblock %}
+
+{% block contenido %}
+<div class="card">
+    <div class="card-header">Crear una Historia Nueva</div>
+    <div class="card-body">
+        <h4 class="card-title">Historias Clínicas</h4>
+        {% include 'historiaclinica/formshistorias.html' %}
+    </div>
+    <div class="card-footer text-muted">Footer</div>
+</div>
+
+{% endblock %}

@@ -1,27 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.db import IntegrityError
 from .models import *
 from django.contrib.auth.decorators import login_required
+from .models import UserProfile, Valoracion
+from django.contrib import messages
+from django.http import JsonResponse
 
-def newhistoriaclinica(request):
-    if request.method == 'POST':
-        try:
-            user = Valoracion.objects.create(
-                tipo=request.POST['type'],
-                numero=request.POST['numero'],
-                username=request.POST['username'],
-                email=request.POST['email'],
-            )
-            user.save()
-            success_message = 'Cuenta Creada Correctamente, Por favor inicie sesión'
-        except IntegrityError as e:
-            if 'unique constraint' in str(e):
-                error_message = 'El usuario ya fue creado'
-            else:
-                error_message = f'Error al crear el usuario: {e}'
 
 def registrarme(request):
     error_message = None
@@ -84,8 +71,77 @@ def registrarme(request):
     }
     return render(request, 'loginregister.html', context)
 
-# ... (el resto de tus vistas)
+@login_required
+def crearhistorias(request):
+    existing_user = None
+    if request.method == 'POST':
+        numero = request.POST.get('numero')
+        existing_user = UserProfile.objects.filter(numero=numero).first()
+        
+        if existing_user:
+            user = existing_user
+        else:
+            user = UserProfile(
+                numero=numero,
+                username=request.POST.get('username'),
+                email=request.POST.get('email'),
+                direccion=request.POST.get('direccion'),
+                edad=request.POST.get('edad'),
+                ocupacion=request.POST.get('ocupacion'),
+                celular=request.POST.get('celular'),
+                fecha_ingreso=request.POST.get('fecha_ingreso'),
+                acudiente=request.POST.get('acudiente'),
+            )
+            user.save()
 
+        valoracion = Valoracion(
+            user=user,
+            tratamiento_medicacion=request.POST.get('tratamiento_medicacion'),
+            reacciones_alergicas=request.POST.get('reacciones_alergicas'),
+            transtorno_tension_arterial=request.POST.get('transtorno_tension_arterial'),
+            diabetes=request.POST.get('diabetes'),
+            transtornos_emocionales=request.POST.get('transtornos_emocionales'),
+            enfermedad_respiratoria=request.POST.get('enfermedad_respiratoria'),
+            otros=request.POST.get('otros'),
+            protesis_dental=request.POST.get('protesis_dental'),
+            total=request.POST.get('total'),
+            acrilico=request.POST.get('acrilico'),
+            flexible=request.POST.get('flexible'),
+            parcial=request.POST.get('parcial'),
+            retenedores=request.POST.get('retenedores'),
+            panoramica=request.POST.get('panoramica'),
+            periapical=request.POST.get('periapical'),
+            cepillado_dental=request.POST.get('cepillado_dental'),
+            seda_dental=request.POST.get('seda_dental'),
+            enjuague_bucal=request.POST.get('enjuague_bucal'),
+        )
+        valoracion.save()
+
+        messages.success(request, 'Historia clínica guardada exitosamente.')
+        return redirect('dashboardDoc.html')  
+    
+    elif request.method == 'GET':
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            numero = request.GET.get('numero')
+            user = UserProfile.objects.filter(numero=numero).first()
+            if user:
+                data = {
+                    'username': user.username,
+                    'email': user.email,
+                    'direccion': user.direccion,
+                    'edad': user.edad,
+                    'ocupacion': user.ocupacion,
+                    'celular': user.celular,
+                    'fecha_ingreso': user.fecha_ingreso.strftime('%Y-%m-%d') if user.fecha_ingreso else '',
+                    'acudiente': user.acudiente,
+                }
+                return JsonResponse(data)
+            return JsonResponse({}, status=404)
+    
+    return render(request, 'historiaclinica/formshistorias.html', {'existing_user': existing_user})
+
+def base(request):
+    return render(request, 'index.html')
 
 def loginregister(request):
     return render(request, 'loginregister.html')
@@ -110,8 +166,60 @@ def configuracion(request):
     return render(request, 'configuracion.html')
 
 @login_required()
-def editaraccount(request):
-    return render(request, 'editaraccount.html')
+def crearcitas(request):
+    return render(request, 'citas/crearcitas.html')
+
+@login_required()
+def listcitas(request):
+    return render(request, 'citas/listcitas.html')
+
+@login_required()
+def editarcitas(request):
+    return render(request, 'citas/editarcitas.html')
+
+@login_required()
+def crearcuentas(request):
+    return render(request, 'cuentas/crearcuentas.html')
+
+@login_required()
+def listcuentas(request):
+    return render(request, 'cuentas/listcuentas.html')
+
+@login_required()
+def editarcuentas(request):
+    return render(request, 'cuentas/editarcuentas.html')
+
+@login_required()
+def crearfechas(request):
+    return render(request, 'fechas/crearfechas.html')
+
+@login_required()
+def listfechas(request):
+    return render(request, 'fechas/listfechas.html')
+
+@login_required()
+def editarfechas(request):
+    return render(request, 'fechas/editarfechas.html')
+
+@login_required()
+def listhistorias(request):
+    return render(request, 'historiaclinica/listhistorias.html')
+
+@login_required()
+def editarhistorias(request):
+    return render(request, 'historiaclinica/editarhistorias.html')
+
+@login_required()
+def crearelemento(request):
+    return render(request, 'inventario/crearelemento.html')
+
+@login_required()
+def listelemento(request):
+    return render(request, 'inventario/listelemento.html')
+
+@login_required()
+def editarelemento(request):
+    return render(request, 'inventario/editarelemento.html')
 
 @login_required()
 def correo(request):
@@ -121,25 +229,5 @@ def correo(request):
 def calendario(request):
     return render(request, 'calendario.html')
 
-@login_required()
-def agendarcita(request):
-    return render(request, 'agendarcita.html')
 
-@login_required()
-def editarcita(request):
-    return render(request, 'editarcitas.html')
 
-@login_required()
-def newhistoriaclinica(request):
-    return render(request, 'newHistoriaClinica.html')
-
-@login_required()
-def historias(request):
-    return render(request, 'historias.html')
-
-@login_required()
-def agregarfechas(request):
-    return render(request, 'agregarfechas.html')
-
-def base(request):
-    return render(request, 'index.html')

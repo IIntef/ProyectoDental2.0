@@ -1,12 +1,15 @@
 {% extends 'index.html' %}
 
 {% load static %}
+
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/newhistoriaclinica.css' %}">
 {% endblock %}
+
 {% block titulo %}
 Nueva Historia Clínica
 {% endblock %}
+
 {% block content %}
   <main>
     <div class="historia">
@@ -15,14 +18,15 @@ Nueva Historia Clínica
         <div class="seccion">
           <h4>Datos Básicos</h4>
           <div class="grid-container">
-            <div class="grid-item"><label>Dirección:</label><input type="number" id="" name="" placeholder="No. Documento" required/></div>
-            <div class="grid-item"><label>Paciente:</label><input type="text" id="" name="" placeholder="Nombre del paciente" required/></div>
-            <div class="grid-item"><label>Identificación:</label><input type="number" id="" name="" placeholder="Número de identificación" required/></div>
-            <div class="grid-item"><label>Edad:</label><input type="number" id="" name="" placeholder="Edad" required/></div>
-            <div class="grid-item"><label>Ocupación:</label><input type="text" id="" name="" placeholder="Ocupación" required/></div>
-            <div class="grid-item"><label>Celular:</label><input type="number" id="" name="" placeholder="Número de celular" required/></div>
-            <div class="grid-item"><label>Fecha de Ingreso:</label><input type="date" id="" name="" required/></div>
-            <div class="grid-item"><label>Acudiente:</label><input type="text" id="" name="" placeholder="Nombre del acudiente" required/></div>
+            <div class="grid-item"><label>Identificación:</label><input type="number" id="numero" name="numero" placeholder="Número de identificación" value="{{ existing_user.numero|default_if_none:'' }}" required/></div>
+            <div class="grid-item"><label>Paciente:</label><input type="text" id="username" name="username" placeholder="Nombre del paciente" value="{{ existing_user.username|default_if_none:'' }}" required/></div>
+            <div class="grid-item"><label>Correo:</label><input type="email" id="email" name="email" placeholder="Correo Electrónico" value="{{ existing_user.email|default_if_none:'' }}" required/></div>
+            <div class="grid-item"><label>Dirección:</label><input type="text" id="direccion" name="direccion" placeholder="No. Documento" required/></div>
+            <div class="grid-item"><label>Edad:</label><input type="number" id="edad" name="edad" placeholder="Edad" required/></div>
+            <div class="grid-item"><label>Ocupación:</label><input type="text" id="ocupacion" name="ocupacion" placeholder="Ocupación" required/></div>
+            <div class="grid-item"><label>Celular:</label><input type="number" id="celular" name="celular" placeholder="Número de celular" required/></div>
+            <div class="grid-item"><label>Fecha de Ingreso:</label><input type="date" id="fecha_ingreso" name="fecha_ingreso" required/></div>
+            <div class="grid-item"><label>Acudiente:</label><input type="text" id="acudiente" name="acudiente" placeholder="Nombre del acudiente" required/></div>
           </div>
         </div>
         
@@ -62,7 +66,7 @@ Nueva Historia Clínica
           </div>
         </div>
 
-        <div class="seccion">
+          <div class="seccion">
           <h4>Descripción</h4>
           <div class="grid-container full-width">
             <textarea placeholder="Especifique" required></textarea>
@@ -70,13 +74,41 @@ Nueva Historia Clínica
         </div>
         
         <div class="botones">
-          <button type="button">Cancelar</button>
+          <button type="cancel">Cancelar</button>
           <button type="submit">Guardar</button>
         </div>
       </form>
     </div>
   </main>
-  {% block extra_js %}
-    <script src="{% static 'js/newhistoriaclinica.js' %}" defer></script> 
-  {% endblock %}
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/newhistoriaclinica.js' %}" defer></script> 
+<script>
+document.getElementById('numero').addEventListener('blur', function() {
+    var numero = this.value;
+    if (numero) {
+        fetch(`/crearhistorias?numero=${numero}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                document.getElementById('username').value = data.username || '';
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('direccion').value = data.direccion || '';
+                document.getElementById('edad').value = data.edad || '';
+                document.getElementById('ocupacion').value = data.ocupacion || '';
+                document.getElementById('celular').value = data.celular || '';
+                document.getElementById('fecha_ingreso').value = data.fecha_ingreso || '';
+                document.getElementById('acudiente').value = data.acudiente || '';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+});
+</script>
 {% endblock %}

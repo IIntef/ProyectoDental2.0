@@ -9,87 +9,143 @@
   <main>
     <section class="botones">
       <div class="botonesdos">
-        <div class="boton1">
-          <a href="{% url 'agendarcita' %}">
+        <div class="boton1 Citas">
+          <a href="{% url 'crearcitas' %}">
             <div class="boton">
               <div class="text">
-                <p>CITA</p>
+                <p>NUEVA CITA</p>
                 <h3>AGENDAR</h3>
               </div>
               <hr/>
               <div class="icon">
-                <i class="fa-solid fa-magnifying-glass"></i>
+                <i class="fa-solid fa-clock"></i>
               </div>
             </div>
           </a>
           
-          <a href="{% url 'editarcita' %}">
+          <a href="{% url 'listcitas' %}">
             <div class="boton">
               <div class="text">
-                <p>CITA</p>
-                <h3>REPROGRAMAR <br> / CANCELAR</h3>
+                <p>AGENDADAS</p>
+                <h3>CITAS</h3>
               </div>
               <hr/>
               <div class="icon">
-                <i class="fa-solid fa-x"></i>
+                <i class="fa-solid fa-user-clock"></i>
               </div>
             </div>
           </a>
         </div>
 
-        <a href="{% url 'agregarfechas' %}">
-          <div class="boton">
-            <div class="text">
-              <p>CITAS</p>
-              <h3>AGREGAR FECHAS</h3>
-            </div>
-            <hr/>
-            <div class="icon">
-              <i class="fa-solid fa-calendar-days"></i>
-            </div>
-          </div>
-        </a>
-
-        <div class="boton2">
-          <a href="{% url 'newhistoriaclinica' %}">
+        <div class="boton2 Fechas">
+          <a href="{% url 'crearfechas' %}">
             <div class="boton">
               <div class="text">
-                <p>AGREGAR NUEVA</p>
-                <h3>HISTORIA CLINICA</h3>
+                <p>FECHAS</p>
+                <h3>AGREGAR </h3>
               </div>
               <hr/>
               <div class="icon">
-                <i class="fa-solid fa-pen"></i>
+                <i class="fa-solid fa-calendar-days"></i>
               </div>
             </div>
           </a>
 
-          <a href="{% url 'historias' %}">
+          <a href="{% url 'listfechas' %}">
             <div class="boton">
               <div class="text">
-                <p>CLINICA</p>
-                <h3>HISTORIA</h3>
+                <p>FECHAS</p>
+                <h3>LISTA</h3>
               </div>
               <hr/>
               <div class="icon">
-                <i class="fa-solid fa-book"></i>
+                <i class="fa-solid fa-list"></i>
               </div>
             </div>
           </a>
         </div>
 
-        <a href="{% url 'configuracion' %}">
-          <div class="boton">
-            <div class="text">
-              <p>DATOS</p>
-              <h3>CONFIGURACIÓN</h3>
+        <div class="boton1 Cuentas">
+          <a href="{% url 'crearcuentas' %}">
+            <div class="boton">
+              <div class="text">
+                <p>CUENTA</p>
+                <h3>CREAR </h3>
+              </div>
+              <hr/>
+              <div class="icon">
+                <i class="fa-solid fa-user-plus"></i>
+              </div>
             </div>
-            <hr/>
-            <div class="icon">
-              <i class="fa-solid fa-gear"></i>
+          </a>
+
+          <a href="{% url 'listcuentas' %}">
+            <div class="boton">
+              <div class="text">
+                <p>CUENTAS</p>
+                <h3>PACIENTES</h3>
+              </div>
+              <hr/>
+              <div class="icon">
+                <i class="fa-solid fa-users"></i>
+              </div>
             </div>
-          </div>
-        </a>
+          </a>
+        </div>
+
+        <div class="boton2 Historias">
+          <a href="{% url 'crearhistorias' %}">
+            <div class="boton">
+              <div class="text">
+                <p>HISTORIAS</p>
+                <h3>CREAR </h3>
+              </div>
+              <hr/>
+              <div class="icon">
+                <i class="fa-solid fa-file-medical"></i>
+              </div>
+            </div>
+          </a>
+
+          <a href="{% url 'listhistorias' %}">
+            <div class="boton">
+              <div class="text">
+                <p>CLINICAS</p>
+                <h3>HISTORIAS</h3>
+              </div>
+              <hr/>
+              <div class="icon">
+                <i class="fa-solid fa-book-medical"></i>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="boton1 Plus">
+          <a href="{% url 'listelemento' %}">
+            <div class="boton">
+              <div class="text">
+                <h3>INVENTARIO</h3>
+              </div>
+              <hr/>
+              <div class="icon">
+                <i class="fa-solid fa-boxes-stacked"></i>
+              </div>
+            </div>
+          </a>
+
+          <a href="{% url 'configuracion' %}">
+            <div class="boton">
+              <div class="text">
+                <h3>CONFIGURACIÓN</h3>
+              </div>
+              <hr/>
+              <div class="icon">
+                <i class="fa-solid fa-gear"></i>
+              </div>
+            </div>
+          </a>
+        </div>
       </div>
     </section>
 

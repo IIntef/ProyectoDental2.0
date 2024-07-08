@@ -44,6 +44,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     numero = models.PositiveIntegerField(unique=True)
     username = models.CharField(max_length=50)
     
+    direccion = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(max_length=100, null=True, blank=True)
     ocupacion = models.CharField(max_length=50, null=True, blank=True)
     celular = models.CharField(max_length=15, null=True, blank=True)  # Changed to CharField
