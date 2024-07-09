@@ -66,13 +66,13 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
 class Valoracion(models.Model):  # Changed to PascalCase
     OPCIONES_SI_NO_NO_SABE = (
-        (1, 'SI'),
-        (2, 'NO'),
-        (3, 'NO SABE'),
+        (1, 'Si'),
+        (2, 'No'),
+        (3, 'Desinformado'),
     )
     OPCIONES_SI_NO = (
-        (1, 'SI'),
-        (2, 'NO'),
+        (1, 'Si'),
+        (2, 'No'),
     )
 
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)

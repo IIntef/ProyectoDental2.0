@@ -1,0 +1,117 @@
+{% extends 'index.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/newhistoriaclinica.css' %}">
+  <style>
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .printable-content, .printable-content * {
+        visibility: visible;
+      }
+      .printable-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+      .no-print {
+        display: none;
+      }
+      body {
+        font-size: 12pt;
+      }
+      .historia {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Divide en dos columnas */
+        gap: 30px; 
+      }
+      .seccion {
+        break-inside: avoid;
+      }
+
+      body, .printable-content {
+        padding-top: 80px;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block titulo %}
+Detalles de Historia Clínica
+{% endblock %}
+
+{% block content %}
+  <main>
+    <div class="historia printable-content">
+    <div class="historia">
+      <div class="seccion">
+        <h4>Datos Básicos</h4>
+        <div class="grid-container">
+          <div class="grid-item"><label>Tipo de Identificación:</label><span>{{ historia.user.get_tipo_display }}</span></div>
+          <div class="grid-item"><label>Número de Identificación:</label><span>{{ historia.user.numero }}</span></div>
+          <div class="grid-item"><label>Nombre de Usuario:</label><span>{{ historia.user.username }}</span></div>
+          <div class="grid-item"><label>Correo:</label><span>{{ historia.user.email }}</span></div>
+          <div class="grid-item"><label>Dirección:</label><span>{{ historia.user.direccion }}</span></div>
+          <div class="grid-item"><label>Edad:</label><span>{{ historia.user.edad }}</span></div>
+          <div class="grid-item"><label>Ocupación:</label><span>{{ historia.user.ocupacion }}</span></div>
+          <div class="grid-item"><label>Celular:</label><span>{{ historia.user.celular }}</span></div>
+          <div class="grid-item"><label>Fecha de Ingreso:</label><span>{{ historia.user.fecha_ingreso|date:"d/m/Y" }}</span></div>
+          <div class="grid-item"><label>Acudiente:</label><span>{{ historia.user.acudiente }}</span></div>
+        </div>
+      </div>
+      
+      <div class="seccion">
+        <h4>Anamnesis</h4>
+        <div class="grid-container">
+          <div class="grid-item"><label>Tratamiento con Medicación:</label><span>{{ historia.get_tratamiento_medicacion_display }}</span></div>
+          <div class="grid-item"><label>Reacciones Alérgicas:</label><span>{{ historia.get_reacciones_alergicas_display }}</span></div>
+          <div class="grid-item"><label>Trastorno de la Tensión Arterial:</label><span>{{ historia.get_transtorno_tension_arterial_display }}</span></div>
+          <div class="grid-item"><label>Diabetes:</label><span>{{ historia.get_diabetes_display }}</span></div>
+          <div class="grid-item"><label>Trastornos Emocionales:</label><span>{{ historia.get_transtornos_emocionales_display }}</span></div>
+          <div class="grid-item"><label>Enfermedad Respiratoria:</label><span>{{ historia.get_enfermedad_respiratoria_display }}</span></div>
+          <div class="grid-item"><label>Otros:</label><span>{{ historia.otros }}</span></div>
+        </div>
+      </div>
+      
+      <div class="seccion">
+        <h4>Rehabilitación Oral</h4>
+        <div class="grid-container">
+          <div class="grid-item"><label>Prótesis Dental:</label><span>{{ historia.protesis_dental }}</span></div>
+          <div class="grid-item"><label>Total:</label><span>{{ historia.total }}</span></div>
+          <div class="grid-item"><label>Acrílico:</label><span>{{ historia.acrilico }}</span></div>
+          <div class="grid-item"><label>Flexible:</label><span>{{ historia.flexible }}</span></div>
+          <div class="grid-item"><label>Parcial:</label><span>{{ historia.parcial }}</span></div>
+          <div class="grid-item"><label>Retenedores:</label><span>{{ historia.retenedores }}</span></div>
+          <div class="grid-item"><label>Panorámica:</label><span>{{ historia.panoramica }}</span></div>
+          <div class="grid-item"><label>Periapical:</label><span>{{ historia.periapical }}</span></div>
+        </div>
+      </div>
+      
+      <div class="seccion">
+        <h4>Higiene Oral</h4>
+        <div class="grid-container">
+          <div class="grid-item"><label>Cepillado Dental:</label><span>{{ historia.get_cepillado_dental_display }}</span></div>
+          <div class="grid-item"><label>Seda Dental:</label><span>{{ historia.get_seda_dental_display }}</span></div>
+          <div class="grid-item"><label>Enjuague Bucal:</label><span>{{ historia.get_enjuague_bucal_display }}</span></div>
+        </div>
+      </div>
+
+      <div class="botones no-print">
+        <button type="button" onclick="window.history.back();">Volver</button>
+        <button type="button" onclick="window.print();">Imprimir</button>
+      </div>
+    </div>
+  </div>
+  </main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function printHistoria() {
+    window.print();
+  }
+</script>
+{% endblock %}

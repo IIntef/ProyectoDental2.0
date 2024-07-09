@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from .models import UserProfile, Valoracion
 from django.contrib import messages
 from django.http import JsonResponse
+from .forms import ValoracionForm
 
 def registrarme(request):
     error_message = None
@@ -69,6 +70,23 @@ def registrarme(request):
     return render(request, 'loginregister.html', context)
 
 @login_required
+def listhistorias(request):
+    historias= Valoracion.objects.all()
+    return render(request, 'historiaclinica/listhistorias.html', {'historias': historias})
+
+@login_required
+def verhistorias(request, id):
+    historia = Valoracion.objects.select_related('user').get(id=id)
+    return render(request, 'historiaclinica/verhistorias.html', {'historia': historia})
+
+
+@login_required
+def eliminarhistorias (request, id):
+    historiaseliminar= Valoracion.objects.get(id=id)
+    historiaseliminar.delete()
+    return  redirect('listhistorias')
+
+@login_required
 def crearhistorias(request):
     if request.method == 'POST':
         numero = request.POST.get('numero')
@@ -109,7 +127,7 @@ def crearhistorias(request):
         valoracion.save()
 
         messages.success(request, 'Historia clínica guardada exitosamente.')
-        return redirect('dashboardDoc')  
+        return redirect('listhistorias')  
     
     elif request.method == 'GET':
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -129,7 +147,7 @@ def crearhistorias(request):
                 return JsonResponse(data)
             return JsonResponse({}, status=404)
     
-    return render(request, 'historiaclinica/formshistorias.html')
+    return render(request, 'historiaclinica/crearhistorias.html')
 
 def base(request):
     return render(request, 'index.html')
@@ -191,14 +209,6 @@ def listfechas(request):
 @login_required()
 def editarfechas(request):
     return render(request, 'fechas/editarfechas.html')
-
-@login_required()
-def listhistorias(request):
-    return render(request, 'historiaclinica/listhistorias.html')
-
-@login_required()
-def editarhistorias(request):
-    return render(request, 'historiaclinica/editarhistorias.html')
 
 @login_required()
 def crearelemento(request):

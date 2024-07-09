@@ -1,71 +1,60 @@
-{% extends 'bass.html' %}
+{% extends 'index.html' %}
 
-{% block titulo %} INDEX {% endblock %}
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/dashboardDoc.css' %}">
+{% endblock %}
 
-{% block contenido %}
+{% block content %}
     <div class="card">
         <div class="card-header">
             <a name="" 
             id="" 
             class="btn btn-success"  
-            href="{% url 'crear' %}"
+            href="{% url 'crearhistorias' %}"
             role="button">
-            Agregar nuevo libro </a>
+            Agregar Nueva Historia Clínica </a>
         </div>
         <div class="card-body">
-            <h4 class="card-title">Libros</h4>
-            <div
-                class="table-responsive"
-            >
-                <table
-                    class="table table-primary"
-                >
+            <h4 class="card-title">Historias Clínicas</h4>
+            <div class="table-responsive">
+                <table class="table table-primary">
                     <thead>
                         <tr>
                             <th scope="col">Id</th>
-                            <th scope="col">Titulo</th>
-                            <th scope="col">Imagen</th>
-                            <th scope="col">Descripción</th>
-                            <th scope="col">Acciones</th>
+                            <th scope="col">Número de Documento</th>
+                            <th scope="col">Paciente</th>
+                            <th scope="col">Ver</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="">
-                            {% for libro in libros %}
-                            <tr class="">
-                                <td>{{ libro.id }}</td>
-                                <td>{{ libro.titulo }}</td>
-                                <td>
-                                    <img src="{{ libro.imagen.url }}" height="100">
-                                </td>
-                                <td>{{ libro.descripcion}}</td>
-                                <td><a
-                                    name=""
-                                    id=""
-                                    class="btn btn-info"
-                                    href="{% url 'editar' libro.id %}"
-                                    role="button"
-                                    >Editar</a
-                                >
-                                | <a
-                                name=""
+                        {% for historia in historias %}
+                        <tr>
+                            <td>{{ historia.id }}</td>
+                            <td>{{ historia.numero }}</td>
+                            <td>{{ historia.username }}</td>
+                            <td>
+                                <a name=""
+                                id=""
+                                class="btn btn-info"
+                                href="{% url 'verhistorias' historia.id %}"
+                                role="button">Ver</a>
+                            </td>
+                            <td>
+                                <a name=""
                                 id=""
                                 class="btn btn-danger"
-                                href="{% url 'eliminar' libro.id %}"
-                                role="button"
-                                >Borrar</a
-                            >
-                                </td>
-                            </tr>
-                            {% endfor %}
+                                href="{% url 'eliminarhistorias' historia.id %}"
+                                role="button">Borrar</a>
                             </td>
                         </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
-            
         </div>
-        <div class="card-footer text-muted">Footer</div>
     </div>
-    
+{% endblock %}
+
+{% block extra_js %}
 {% endblock %}

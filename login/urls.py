@@ -13,7 +13,7 @@ urlpatterns = [
     path('calendario/', views.calendario, name="calendario"),
     
     path('crear-citas/', views.crearcitas, name="crearcitas"),
-    path('editar-citas/', views.editarcitas, name="editarcitas"),
+    path('editar-citas/<int:id>', views.editarcitas, name="editarcitas"),
     path('list-citas/', views.listcitas, name="listcitas"),
     
     path('crear-cuentas/', views.crearcuentas, name="crearcuentas"),
@@ -25,8 +25,10 @@ urlpatterns = [
     path('list-fechas/', views.listfechas, name="listfechas"),
     
     path('crear-historias/', views.crearhistorias, name="crearhistorias"),
-    path('editar-historias/', views.editarhistorias, name="editarhistorias"),
+    path('ver-historias/<int:id>', views.verhistorias, name="verhistorias"),
     path('list-historias/', views.listhistorias, name="listhistorias"),
+    path('eliminarhistorias/<int:id>', views.eliminarhistorias, name="eliminarhistorias"),
+
     
     path('crear-elemento/', views.crearelemento, name="crearelemento"),
     path('editar-elemento/', views.editarelemento, name="editarelemento"),
