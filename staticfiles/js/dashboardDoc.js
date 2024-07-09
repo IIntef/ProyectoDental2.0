@@ -58,3 +58,31 @@ document.addEventListener('click', (event) => {
     profileDropdownBtn.classList.remove('show-caption');
   }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+  const numeroInput = document.getElementById('numero');
+  numeroInput.addEventListener('blur', function() {
+      const numero = this.value;
+      if (numero) {
+          fetch(`/crear-historias?numero=${numero}`, {
+              headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+              }
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data) {
+                  document.getElementById('username').value = data.username;
+                  document.getElementById('email').value = data.email;
+                  document.getElementById('direccion').value = data.direccion;
+                  document.getElementById('edad').value = data.edad;
+                  document.getElementById('ocupacion').value = data.ocupacion;
+                  document.getElementById('celular').value = data.celular;
+                  document.getElementById('fecha_ingreso').value = data.fecha_ingreso;
+                  document.getElementById('acudiente').value = data.acudiente;
+              }
+          })
+          .catch(error => console.error('Error:', error));
+      }
+  });
+});

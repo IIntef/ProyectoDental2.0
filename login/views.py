@@ -9,7 +9,6 @@ from .models import UserProfile, Valoracion
 from django.contrib import messages
 from django.http import JsonResponse
 
-
 def registrarme(request):
     error_message = None
     success_message = None
@@ -21,7 +20,6 @@ def registrarme(request):
         if password1 and password2:
             if password1 == password2:
                 try:
-                    # Verificar si ya existe un usuario con el mismo número de documento
                     existing_user = UserProfile.objects.get(numero=request.POST['numero'])
                     error_message = 'El número de documento ya está en uso'
                 except UserProfile.DoesNotExist:
@@ -49,11 +47,10 @@ def registrarme(request):
             if request.method == 'POST':
                 numero = request.POST.get('numer')
                 password = request.POST.get('contra')
-                #user = UserProfile.objects.get(numero=numero, password=password)
                 user = authenticate(request, username=numero, password=password)
                 if user is not None:
                     login(request, user)
-                    if numero =='020508'and password=='020508admin':
+                    if numero == '020508' and password == '020508admin':
                         return redirect('dashboardDoc')
                     else:
                         return redirect('dashboard')
@@ -73,26 +70,20 @@ def registrarme(request):
 
 @login_required
 def crearhistorias(request):
-    existing_user = None
     if request.method == 'POST':
         numero = request.POST.get('numero')
-        existing_user = UserProfile.objects.filter(numero=numero).first()
+        user, created = UserProfile.objects.get_or_create(numero=numero)
         
-        if existing_user:
-            user = existing_user
-        else:
-            user = UserProfile(
-                numero=numero,
-                username=request.POST.get('username'),
-                email=request.POST.get('email'),
-                direccion=request.POST.get('direccion'),
-                edad=request.POST.get('edad'),
-                ocupacion=request.POST.get('ocupacion'),
-                celular=request.POST.get('celular'),
-                fecha_ingreso=request.POST.get('fecha_ingreso'),
-                acudiente=request.POST.get('acudiente'),
-            )
-            user.save()
+        # Actualizar los datos del usuario
+        user.username = request.POST.get('username')
+        user.email = request.POST.get('email')
+        user.direccion = request.POST.get('direccion')
+        user.edad = request.POST.get('edad')
+        user.ocupacion = request.POST.get('ocupacion')
+        user.celular = request.POST.get('celular')
+        user.fecha_ingreso = request.POST.get('fecha_ingreso')
+        user.acudiente = request.POST.get('acudiente')
+        user.save()
 
         valoracion = Valoracion(
             user=user,
@@ -118,7 +109,7 @@ def crearhistorias(request):
         valoracion.save()
 
         messages.success(request, 'Historia clínica guardada exitosamente.')
-        return redirect('dashboardDoc.html')  
+        return redirect('dashboardDoc')  
     
     elif request.method == 'GET':
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -138,7 +129,7 @@ def crearhistorias(request):
                 return JsonResponse(data)
             return JsonResponse({}, status=404)
     
-    return render(request, 'historiaclinica/formshistorias.html', {'existing_user': existing_user})
+    return render(request, 'historiaclinica/formshistorias.html')
 
 def base(request):
     return render(request, 'index.html')
@@ -228,6 +219,3 @@ def correo(request):
 @login_required()
 def calendario(request):
     return render(request, 'calendario.html')
-
-
-

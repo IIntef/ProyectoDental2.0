@@ -75,7 +75,9 @@ class Valoracion(models.Model):  # Changed to PascalCase
         (2, 'NO'),
     )
 
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)  # Added ForeignKey to UserProfile
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    username = models.CharField(max_length=150, blank=True) 
+    numero = models.CharField(max_length=50, blank=True)  
     tratamiento_medicacion = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO_NO_SABE, default=3)
     reacciones_alergicas = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO_NO_SABE, default=3)
     transtorno_tension_arterial = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO_NO_SABE, default=3)
@@ -98,6 +100,12 @@ class Valoracion(models.Model):  # Changed to PascalCase
     seda_dental = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO)
     enjuague_bucal = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO)
 
+    def save(self, *args, **kwargs):
+        if self.user:
+            self.username = self.user.username
+            self.numero = self.user.numero
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.user.username}'s Valoracion"
+        return f"Valoración de {self.username} (Número: {self.numero})"
     
