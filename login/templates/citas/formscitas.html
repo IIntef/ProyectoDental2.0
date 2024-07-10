@@ -1,46 +1,120 @@
-<form =enctype="multipart/form-data" method="POST">
-    {% csrf_token %}
+<form enctype="multipart/form-data" method="POST">
+  {% csrf_token %}
 
-{% for campo in formulario%}
-<div class="mb-3">
-    <label for="" class="form-label">{{  campo.label }}</label>
-
-    {% if campo.field.widget.input_type == 'file' and campo.value %}
-    <br/>
-    <img src="{{MEDIA_URL}}/IMAGENES/{{CAMPO.VALUE}}" width="100">
-    {% endif %}
-
-    <input
-        type="{{ campo.field.widget.input_type}}"
+  <div class="seccion">
+    <h4>Datos Básicos</h4>
+    {% for campo in formulario %} {% if campo.name in
+    'tipo,numero,username,email,direccion,edad,ocupacion,celular,fecha_ingreso,acudiente'
+    %}
+    <div class="mb-3">
+      <label for="" class="form-label">{{ campo.label }}</label>
+      {% if campo.name == 'tipo' %}
+      <select class="form-control" name="{{ campo.name }}" id="" required>
+        <option value="1">T.I</option>
+        <option value="2" selected>C.C</option>
+        <option value="3">C.E</option>
+        <option value="4">C.I</option>
+      </select>
+      {% else %}
+      <input
+        type="{{ campo.field.widget.input_type }}"
         class="form-control"
-        name="{{ campo.name}}"
+        name="{{ campo.name }}"
         id=""
         aria-describedby="helpId"
         placeholder="{{ campo.label }}"
-        value = "{{ campo.value | default:''}}"
-    />
-</div>
+        value="{{ campo.value|default:'' }}"
+        {%
+        if
+        campo.field.required
+        %}required{%
+        endif
+        %}
+      />
+      {% endif %}
+    </div>
+    <div class="col-12 help-text">{{ campo.errors }}</div>
+    {% endif %} {% endfor %}
+  </div>
 
-<div class="col-12 help-text">{{ campo.errors }}</div>
-{% endfor %}
+  <div class="seccion">
+    <h4>Anamnesis</h4>
+    {% for campo in formulario %} {% if campo.name in
+    'tratamiento_medicacion,reacciones_alergicas,transtorno_tension_arterial,diabetes,transtornos_emocionales,enfermedad_respiratoria,otros'
+    %}
+    <div class="mb-3">
+      <label for="" class="form-label">{{ campo.label }}</label>
+      {% if campo.name != 'otros' %}
+      <select class="form-control" name="{{ campo.name }}" id="" required>
+        <option value="1">SI</option>
+        <option value="2">NO</option>
+        <option value="3" selected>NO SABE</option>
+      </select>
+      {% else %}
+      <input
+        type="{{ campo.field.widget.input_type }}"
+        class="form-control"
+        name="{{ campo.name }}"
+        id=""
+        aria-describedby="helpId"
+        placeholder="Especifique"
+        value="{{ campo.value|default:'' }}"
+      />
+      {% endif %}
+    </div>
+    <div class="col-12 help-text">{{ campo.errors }}</div>
+    {% endif %} {% endfor %}
+  </div>
 
-<input
+  <div class="seccion">
+    <h4>Rehabilitación Oral</h4>
+    {% for campo in formulario %} {% if campo.name in
+    'protesis_dental,total,acrilico,flexible,parcial,retenedores,panoramica,periapical'
+    %}
+    <div class="mb-3">
+      <label for="" class="form-label">{{ campo.label }}</label>
+      <input
+        type="{{ campo.field.widget.input_type }}"
+        class="form-control"
+        name="{{ campo.name }}"
+        id=""
+        aria-describedby="helpId"
+        placeholder="Especifique"
+        value="{{ campo.value|default:'' }}"
+      />
+    </div>
+    <div class="col-12 help-text">{{ campo.errors }}</div>
+    {% endif %} {% endfor %}
+  </div>
+
+  <div class="seccion">
+    <h4>Higiene Oral</h4>
+    {% for campo in formulario %} {% if campo.name in
+    'cepillado_dental,seda_dental,enjuague_bucal' %}
+    <div class="mb-3">
+      <label for="" class="form-label">{{ campo.label }}</label>
+      <select class="form-control" name="{{ campo.name }}" id="" required>
+        <option value="1">SI</option>
+        <option value="2">NO</option>
+      </select>
+    </div>
+    <div class="col-12 help-text">{{ campo.errors }}</div>
+    {% endif %} {% endfor %}
+  </div>
+
+  <input
     type="submit"
     class="btn btn-success"
     name=""
     id=""
     value="Enviar Información"
-/>
-<a
+  />
+  <a
     name=""
     id=""
     class="btn btn-warning"
     href="{% url 'libros' %}"
     role="button"
     >Volver</a
->
-
-</div>
-
-
+  >
 </form>

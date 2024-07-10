@@ -73,15 +73,7 @@
       </div>
     </div>
 
-    <main>
-      <div class="container">
-          <div class="row">
-              <div class="col-12">
-                  {% block content %} {% endblock %}
-              </div>
-          </div>
-      </div>
-    </main>
+    {% block content %} {% endblock %}
   </div>
   <script src="{% static 'js/dashboardDoc.js' %}?v1.2"></script> 
   {% block extra_js %}     

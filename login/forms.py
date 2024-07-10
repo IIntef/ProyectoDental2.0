@@ -4,9 +4,12 @@ from .models import UserProfile, Valoracion
 class UserForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = '__all__'
+        fields = ['tipo', 'numero', 'username', 'email', 'direccion', 'edad', 'ocupacion', 'celular', 'fecha_ingreso', 'acudiente']
+        widgets = {
+            'fecha_ingreso': forms.DateInput(attrs={'type': 'date'}),
+        }
 
 class ValoracionForm(forms.ModelForm):
     class Meta:
         model = Valoracion
-        fields = '__all__'
+        exclude = ['user', 'username', 'numero']

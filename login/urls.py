@@ -33,4 +33,6 @@ urlpatterns = [
     path('crear-elemento/', views.crearelemento, name="crearelemento"),
     path('editar-elemento/', views.editarelemento, name="editarelemento"),
     path('list-elemento/', views.listelemento, name="listelemento"),
+    
+    path('fetch-user-details/', views.fetch_user_details, name='fetch_user_details'),
 ]
