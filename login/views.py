@@ -1,12 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
-from django.contrib import messages
 from django.db import IntegrityError
 from .models import *
 from django.contrib.auth.decorators import login_required
 from .models import UserProfile, Valoracion
-from django.contrib import messages
 from django.http import JsonResponse
 from .forms import ValoracionForm, UserForm
 
@@ -72,6 +69,7 @@ def verhistorias(request, id):
     historia = Valoracion.objects.select_related('user').get(id=id)
     return render(request, 'historiaclinica/verhistorias.html', {'historia': historia})
 
+@login_required
 def fetch_user_details(request):
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         numero = request.GET.get('numero')
@@ -84,52 +82,52 @@ def fetch_user_details(request):
                 'edad': user.edad,
                 'ocupacion': user.ocupacion,
                 'celular': user.celular,
-                'fecha_ingreso': user.fecha_ingreso.strftime('%Y-%m-%d') if user.fecha_ingreso else '',
                 'acudiente': user.acudiente,
             }
             return JsonResponse(data)
     return JsonResponse({}, status=404)
 
 @login_required
-def eliminarhistorias (request, id):
-    historiaseliminar= Valoracion.objects.get(id=id)
-    historiaseliminar.delete()
-    return  redirect('listhistorias')
+def eliminarhistorias(request, id):
+    historiaseliminar = get_object_or_404(Valoracion, id=id)
+    
+    if request.method == 'POST':
+        historiaseliminar.delete()
+        return redirect('listhistorias')
+    
+    return redirect('listhistorias')
 
 @login_required
 def crearhistorias(request):
-    formularioI = UserForm(request.POST or None, request.FILES or None)
-    formularioII = ValoracionForm(request.POST or None, request.FILES or None)
-    
-    if formularioI.is_valid() and formularioII.is_valid():
-        user = formularioI.save()  # This will update the existing user
-        valoracion = formularioII.save(commit=False)
-        valoracion.user = user
-        valoracion.save()
-        return redirect('listhistorias')
-        
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        numero = request.GET.get('numero')
+    if request.method == 'POST':
+        numero = request.POST.get('numero')
         user = UserProfile.objects.filter(numero=numero).first()
+        
         if user:
-            data = {
-                'username': user.username,
-                'email': user.email,
-                'direccion': user.direccion,
-                'edad': user.edad,
-                'ocupacion': user.ocupacion,
-                'celular': user.celular,
-                'acudiente': user.acudiente,
-            }
-            return JsonResponse(data)
-        return JsonResponse({}, status=404)
+            formularioI = UserForm(request.POST, instance=user)
+        else:
+            formularioI = UserForm(request.POST)
+        
+        formularioII = ValoracionForm(request.POST)
+        
+        if formularioI.is_valid() and formularioII.is_valid():
+            user = formularioI.save()
+            valoracion = formularioII.save(commit=False)
+            valoracion.user = user
+            valoracion.save()
+            return redirect('listhistorias')
+        else:
+            print("Errores en formularioI:", formularioI.errors)
+            print("Errores en formularioII:", formularioII.errors)
+    else:
+        formularioI = UserForm()
+        formularioII = ValoracionForm()
     
     context = {
         'formularioI': formularioI,
         'formularioII': formularioII
     }
     return render(request, 'historiaclinica/crearhistorias.html', context)
-
 
 def crear(request):
     formulario= LibroForm(request.POST or None, request.FILES or None)

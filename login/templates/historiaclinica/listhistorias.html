@@ -3,6 +3,43 @@
 {% load static %}
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/dashboardDoc.css' %}">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -22,9 +59,11 @@
                     <thead>
                         <tr>
                             <th scope="col">Id</th>
-                            <th scope="col">Número de Documento</th>
+                            <th scope="col">Documento</th>
                             <th scope="col">Paciente</th>
+                            <th scope="col">Fecha Historia</th>
                             <th scope="col">Ver</th>
+                            <th scope="col">Borrar</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -33,6 +72,7 @@
                             <td>{{ historia.id }}</td>
                             <td>{{ historia.numero }}</td>
                             <td>{{ historia.username }}</td>
+                            <td>{{ historia.fecha_historia }}</td>  
                             <td>
                                 <a name=""
                                 id=""
@@ -41,20 +81,38 @@
                                 role="button">Ver</a>
                             </td>
                             <td>
-                                <a name=""
-                                id=""
-                                class="btn btn-danger"
-                                href="{% url 'eliminarhistorias' historia.id %}"
-                                role="button">Borrar</a>
-                            </td>
+                                <button class="btn btn-danger" onclick="confirmarEliminacion('{{ historia.id }}', '{{ historia.username }}', '{{ historia.numero }}')">Borrar</button>
+                            </td>                            
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
+        <a
+            name=""
+            id=""
+            class="btn btn-primary"
+            href="{% url 'dashboardDoc' %}"
+            role="button"
+            >Volver</a>
+        
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div id="confirmarModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <p>¿Estás seguro de que deseas eliminar la historia de <strong id="historiaUsername"></strong> (Número: <strong id="historiaNumero"></strong>)?</p>
+            <form id="formEliminar" method="POST" action="">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+                <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+            </form>
+        </div>
     </div>
 {% endblock %}
 
 {% block extra_js %}
+    <script src="{% static 'js/historias.js' %}"></script>
 {% endblock %}

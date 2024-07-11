@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function confirmarEliminacion(id, username, numero) {
     document.getElementById('historiaUsername').textContent = username;
     document.getElementById('historiaNumero').textContent = numero;
-    const actionUrl = `/eliminarhistorias/${id}/`;
+    const actionUrl = `/eliminarhistorias/${id}`;
     document.getElementById('formEliminar').action = actionUrl;
     document.getElementById('confirmarModal').style.display = 'block';
 }

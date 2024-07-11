@@ -48,7 +48,6 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=100, null=True, blank=True)
     ocupacion = models.CharField(max_length=50, null=True, blank=True)
     celular = models.CharField(max_length=15, null=True, blank=True)  # Changed to CharField
-    fecha_ingreso = models.DateField(null=True, blank=True)  # Changed to snake_case
     acudiente = models.CharField(max_length=50, null=True, blank=True)  # Changed default to blank=True
     edad = models.PositiveSmallIntegerField(null=True, blank=True)
     is_active = models.BooleanField(default=True, null=True, blank=True)
@@ -77,7 +76,8 @@ class Valoracion(models.Model):  # Changed to PascalCase
 
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     username = models.CharField(max_length=150, blank=True) 
-    numero = models.CharField(max_length=50, blank=True)  
+    numero = models.CharField(max_length=50, blank=True) 
+    fecha_historia = models.DateField(null=True, blank=True) 
     tratamiento_medicacion = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO_NO_SABE, default=3)
     reacciones_alergicas = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO_NO_SABE, default=3)
     transtorno_tension_arterial = models.PositiveSmallIntegerField(choices=OPCIONES_SI_NO_NO_SABE, default=3)

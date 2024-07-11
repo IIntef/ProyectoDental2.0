@@ -4,7 +4,7 @@
   <div class="seccion">
       <h4>Datos Básicos</h4>
       {% for campo in formularioI %}
-          {% if campo.name in 'tipo,numero,username,email,direccion,edad,ocupacion,celular,fecha_ingreso,acudiente' %}
+          {% if campo.name in 'tipo,numero,username,email,direccion,edad,ocupacion,celular,acudiente' %}
               <div class="mb-3">
                   <label for="id_{{ campo.name }}" class="form-label">{{ campo.label }}</label>
                   {% if campo.name == 'tipo' %}
@@ -14,15 +14,6 @@
                           <option value="3">C.E</option>
                           <option value="4">C.I</option>
                       </select>
-                  {% elif campo.name == 'fecha_ingreso' %}
-                      <input
-                          type="date"
-                          class="form-control"
-                          name="{{ campo.name }}"
-                          id="id_{{ campo.name }}"
-                          value="{{ campo.value|date:'Y-m-d'|default:'' }}"
-                          {% if campo.field.required %}required{% endif %}
-                      />
                   {% else %}
                       <input
                           type="{{ campo.field.widget.input_type }}"
@@ -35,6 +26,21 @@
                           {% if campo.field.required %}required{% endif %}
                       />
                   {% endif %}
+              </div>
+          {% endif %}
+      {% endfor %}
+			{% for campo in formularioII %}
+          {% if campo.name == 'fecha_historia' %}
+              <div class="mb-3">
+                  <label for="id_{{ campo.name }}" class="form-label">{{ campo.label }}</label>
+                  <input
+                      type="date"
+                      class="form-control"
+                      name="{{ campo.name }}"
+                      id="id_{{ campo.name }}"
+                      value="{{ campo.value|date:'Y-m-d'|default:'' }}"
+                      {% if campo.field.required %}required{% endif %}
+                  />
               </div>
           {% endif %}
       {% endfor %}
@@ -108,10 +114,10 @@
 
   <button type="submit" class="btn btn-success">Guardar</button>
   <a
-      name=""
-      id=""
-      class="btn btn-warning"
-      href="{% url 'listhistorias' %}"
-      role="button"
-  >Volver</a>
+            name=""
+            id=""
+            class="btn btn-primary"
+            href="{% url 'dashboardDoc' %}"
+            role="button"
+            >Volver</a>
 </form>

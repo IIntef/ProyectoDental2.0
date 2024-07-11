@@ -27,7 +27,7 @@ urlpatterns = [
     path('crear-historias/', views.crearhistorias, name="crearhistorias"),
     path('ver-historias/<int:id>', views.verhistorias, name="verhistorias"),
     path('list-historias/', views.listhistorias, name="listhistorias"),
-    path('eliminarhistorias/<int:id>', views.eliminarhistorias, name="eliminarhistorias"),
+    path('eliminarhistorias/<int:id>/', views.eliminarhistorias, name="eliminarhistorias"),
 
     
     path('crear-elemento/', views.crearelemento, name="crearelemento"),
