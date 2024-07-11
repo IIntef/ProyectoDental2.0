@@ -61,7 +61,10 @@ def registrarme(request):
 
 @login_required
 def listhistorias(request):
-    historias= Valoracion.objects.all()
+    if request.user.is_superuser:
+        historias = Valoracion.objects.all()
+    else:
+        historias = Valoracion.objects.filter(user=request.user)
     return render(request, 'historiaclinica/listhistorias.html', {'historias': historias})
 
 @login_required
@@ -129,8 +132,6 @@ def crearhistorias(request):
     }
     return render(request, 'historiaclinica/crearhistorias.html', context)
 
-
-
 def base(request):
     return render(request, 'index.html')
 
@@ -153,8 +154,16 @@ def dashboardDoc(request):
     return render(request, 'dashboardDoc.html')
 
 @login_required()
-def configuracion(request):
-    return render(request, 'configuracion.html')
+def configuracion(request, id):
+    form_edcuentas = UserProfile.objects.get(id=id)
+    if request.method == 'POST':
+        form = UserForm(request.POST, request.FILES, instance=form_edcuentas)
+        if form.is_valid():
+            form.save()
+            return redirect('listcuentas') 
+    else:
+        form = UserForm(instance=form_edcuentas)
+    return render(request, 'configuracion.html', {'form': form})
 
 @login_required()
 def crearcitas(request):
@@ -185,9 +194,17 @@ def listcuentas(request):
     cuentas= UserProfile.objects.all()
     return render(request, 'cuentas/listcuentas.html', {'cuentas': cuentas})
 
-@login_required()
-def editarcuentas(request):
-    return render(request, 'cuentas/editarcuentas.html')
+@login_required
+def editarcuentas(request, id):
+    form_edcuentas = UserProfile.objects.get(id=id)
+    if request.method == 'POST':
+        form = UserForm(request.POST, request.FILES, instance=form_edcuentas)
+        if form.is_valid():
+            form.save()
+            return redirect('listcuentas') 
+    else:
+        form = UserForm(instance=form_edcuentas)
+    return render(request, 'cuentas/editarcuentas.html', {'form': form})
 
 @login_required()
 def crearfechas(request):

@@ -2,81 +2,76 @@
 
 {% load static %}
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/dashboardDoc.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboardDoc.css' %}?v1.3">
 {% endblock %}
 
 {% block content %}
   <main>
     <section class="botones">
       <div class="botonesdos">
-        <a href="{% url 'agendarcita' %}">
-          <div class="boton">
-            <div class="text">
-              <p>CITA</p>
-              <h3>AGENDAR</h3>
+          <a href="{% url 'crearcitas' %}">
+            <div class="boton">
+              <div class="text">
+                <p>NUEVA CITA</p>
+                <h3>AGENDAR</h3>
+              </div>
+              <hr/>
+              <div class="icon">
+                <i class="fa-solid fa-clock"></i>
+              </div>
             </div>
-            <hr/>
-            <div class="icon">
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-          </div>
-        </a>
-        
-        <a href="{% url 'editarcita' %}">
-          <div class="boton">
-            <div class="text">
-              <p>CITA</p>
-              <h3>REPROGRAMAR<br> / CANCELAR</h3>
-            </div>
-            <hr/>
-            <div class="icon">
-              <i class="fa-solid fa-x"></i>
-            </div>
-          </div>
-        </a>
+          </a>
 
-        <a href="{% url 'historias' %}">
-          <div class="boton">
-            <div class="text">
-              <p>CLINICA</p>
-              <h3>HISTORIA</h3>
+          <a href="{% url 'listcitas' %}">
+            <div class="boton">
+              <div class="text">
+                <p>CITAS</p>
+                <h3>REPROGRAMAR O <br> CANCELAR</h3>
+              </div>
+              <hr/>
+              <div class="icon">
+                <i class="fa-solid fa-user-clock"></i>
+              </div>
             </div>
-            <hr/>
-            <div class="icon">
-              <i class="fa-solid fa-book"></i>
-            </div>
-          </div>
-        </a>
+          </a>
 
-        <a href="{% url 'configuracion' %}">
-          <div class="boton">
-            <div class="text">
-              <p>DATOS</p>
-              <h3>CONFIGURACIÓN</h3>
+          <a href="{% url 'listhistorias' %}">
+            <div class="boton">
+              <div class="text">
+                <p>CLINICAS</p>
+                <h3>HISTORIAS</h3>
+              </div>
+              <hr/>
+              <div class="icon">
+                <i class="fa-solid fa-book-medical"></i>
+              </div>
             </div>
-            <hr/>
-            <div class="icon">
-              <i class="fa-solid fa-gear"></i>
+          </a>
+
+          <a href="{% url 'configuracion' form_edcuentas.id %}">
+            <div class="boton">
+              <div class="text">
+                <h3>CONFIGURACIÓN</h3>
+              </div>
+              <hr/>
+              <div class="icon">
+                <i class="fa-solid fa-gear"></i>
+              </div>
             </div>
-          </div>
-        </a>
+          </a>
       </div>
     </section>
 
     <aside class="recordatorio">
-      <div class="right-column">
         <div class="agenda">
-          <h2><i class="fas fa-calendar-alt"></i>Agenda</h2>
-          <div id="calendar"> 
-          </div>
+          <img src="{% static 'img\calendario.jpg' %}" alt="asignacion de citas" title="asignacion de citas" height="100%" width="100%">
         </div>
-      </div>
+        <div class="citas">
+          
+        </div>
     </aside>
   </main>
-  {% block extra_js %}
-    <script src="{% static 'js/dashboardDoc.js' %}" defer></script> 
-  {% endblock %}
 {% endblock %}
     
-
-    
+{% block extra_js %}
+{% endblock %}

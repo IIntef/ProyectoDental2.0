@@ -8,7 +8,7 @@ urlpatterns = [
     path('loginregister/', views.registrarme, name="loginregister"),
     path('dashboard/', views.dashboard, name="dashboard"),
     path('signout/', views.signout, name="signout"),
-    path('configuracion/', views.configuracion, name="configuracion"),
+    path('configuracion/<int:id>/', views.configuracion, name="configuracion"),
     path('correo/', views.correo, name="correo"),
     path('calendario/', views.calendario, name="calendario"),
     
@@ -17,7 +17,7 @@ urlpatterns = [
     path('list-citas/', views.listcitas, name="listcitas"),
     
     path('crear-cuentas/', views.crearcuentas, name="crearcuentas"),
-    path('editar-cuentas/', views.editarcuentas, name="editarcuentas"),
+    path('editar-cuentas/<int:id>', views.editarcuentas, name="editarcuentas"),
     path('list-cuentas/', views.listcuentas, name="listcuentas"),
     
     path('crear-fechas/', views.crearfechas, name="crearfechas"),
