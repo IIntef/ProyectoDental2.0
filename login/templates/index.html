@@ -24,7 +24,7 @@
         <nav class="navbar">
           <ul class="navbar-list">
               <li class="profile-dropdown-list-item">
-                <a href="{% url 'configuracion' %}">
+                <a href="{% url 'configuracion' id=request.user.userprofile.id %}">
                   <i class="fa-regular fa-user"></i>
                   <span>Editar Perfil</span>
                 </a>

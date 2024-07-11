@@ -134,7 +134,7 @@
             </div>
           </a>
 
-          <a href="{% url 'configuracion' %}">
+          <a href="{% url 'configuracion' id=request.user.userprofile.id %}">
             <div class="boton">
               <div class="text">
                 <h3>CONFIGURACIÓN</h3>

@@ -155,14 +155,23 @@ def dashboardDoc(request):
 
 @login_required()
 def configuracion(request, id):
-    form_edcuentas = UserProfile.objects.get(id=id)
+    # Obtener el UserProfile
+    perfil_usuario = UserProfile.objects.get(id=id)
+    
+    # Verificar permisos: solo el usuario dueño del perfil o un superusuario pueden editar
+    if not (request.user.is_superuser or request.user == perfil_usuario.user):
+        # Si el usuario no es superusuario ni el dueño del perfil, redirigir o mostrar un mensaje de error
+        return redirect('pagina_de_error')  # Reemplaza 'pagina_de_error' con la URL o nombre de la vista de tu elección
+    
     if request.method == 'POST':
-        form = UserForm(request.POST, request.FILES, instance=form_edcuentas)
+        form = UserForm(request.POST, request.FILES, instance=perfil_usuario)
         if form.is_valid():
             form.save()
-            return redirect('listcuentas') 
+            return redirect('listcuentas')  # Redirige a la lista de cuentas después de guardar
     else:
-        form = UserForm(instance=form_edcuentas)
+        form = UserForm(instance=perfil_usuario)
+        
+    # Renderizar el template con el formulario apropiado
     return render(request, 'configuracion.html', {'form': form})
 
 @login_required()
