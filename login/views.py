@@ -129,32 +129,6 @@ def crearhistorias(request):
     }
     return render(request, 'historiaclinica/crearhistorias.html', context)
 
-def crear(request):
-    formulario= LibroForm(request.POST or None, request.FILES or None)
-    if formulario.is_valid():
-        formulario.save()
-        return redirect('libros')
-    return render(request, 'libros/crear.html', {'formulario': formulario})
-
-@login_required
-def libros(request):
-    libros= libro.objects.all()
-    return render(request, 'libros/indes.html', {'libros': libros})
-
-@login_required
-def editar(request, id):
-    libro_ed = libro.objects.get(id=id)
-    formulario = LibroForm(request.POST or None, request.FILES or None, instance=libro_ed) 
-    if formulario.is_valid():
-        formulario.save()
-        return redirect('libros')   
-    return render(request, 'libros/editar.html', { 'formulario': formulario})
-
-@login_required
-def eliminar (request, id):
-    libroe= libro.objects.get(id=id)
-    libroe.delete()
-    return  redirect('libros')
 
 
 def base(request):
@@ -196,11 +170,20 @@ def editarcitas(request):
 
 @login_required()
 def crearcuentas(request):
-    return render(request, 'cuentas/crearcuentas.html')
+    if request.method == 'POST':
+        form = UserForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('listcuentas')  
+    else:
+        form = UserForm()
+    
+    return render(request, 'cuentas/crearcuentas.html', {'form': form})
 
-@login_required()
+@login_required
 def listcuentas(request):
-    return render(request, 'cuentas/listcuentas.html')
+    cuentas= UserProfile.objects.all()
+    return render(request, 'cuentas/listcuentas.html', {'cuentas': cuentas})
 
 @login_required()
 def editarcuentas(request):

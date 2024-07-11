@@ -1,71 +1,128 @@
-{% extends 'bass.html' %}
+{% extends 'index.html' %}
 
-{% block titulo %} INDEX {% endblock %}
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/dashboardDoc.css' %}">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
 
-{% block contenido %}
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
     <div class="card">
         <div class="card-header">
             <a name="" 
             id="" 
             class="btn btn-success"  
-            href="{% url 'crear' %}"
+            href="{% url 'crearcuentas' %}"
             role="button">
-            Agregar nuevo libro </a>
+            Agregar Nuevo Paciente </a>
         </div>
         <div class="card-body">
-            <h4 class="card-title">Libros</h4>
-            <div
-                class="table-responsive"
-            >
-                <table
-                    class="table table-primary"
-                >
+            <h4 class="card-title">Pacientes Registrados</h4>
+            <div class="table-responsive">
+                <table class="table table-primary">
                     <thead>
                         <tr>
                             <th scope="col">Id</th>
-                            <th scope="col">Titulo</th>
-                            <th scope="col">Imagen</th>
-                            <th scope="col">Descripción</th>
+                            <th scope="col">Tipo Documento</th>
+                            <th scope="col">No. Documento</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">E-mail</th>
+                            <th scope="col">Dirección</th>
+                            <th scope="col">Edad</th>
+                            <th scope="col">Ocupación</th>
+                            <th scope="col">Celular</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="">
-                            {% for libro in libros %}
-                            <tr class="">
-                                <td>{{ libro.id }}</td>
-                                <td>{{ libro.titulo }}</td>
-                                <td>
-                                    <img src="{{ libro.imagen.url }}" height="100">
-                                </td>
-                                <td>{{ libro.descripcion}}</td>
-                                <td><a
-                                    name=""
-                                    id=""
-                                    class="btn btn-info"
-                                    href="{% url 'editar' libro.id %}"
-                                    role="button"
-                                    >Editar</a
-                                >
-                                | <a
-                                name=""
+                        {% for cuenta in cuentas %}
+                        <tr>
+                            <td>{{ cuenta.id }}</td>
+                            <td>{{ cuenta.numero }}</td>
+                            <td>{{ cuenta.username }}</td>
+                            <td>{{ cuenta.email }}</td>  
+                            <td>{{ cuenta.id }}</td>
+                            <td>{{ cuenta.numero }}</td>
+                            <td>{{ cuenta.username }}</td>
+                            <td>{{ cuenta.email }}</td>  
+                            <td>{{ cuenta.id }}</td>
+                            <td>{{ cuenta.numero }}</td>
+                            <td>
+                                <a name=""
                                 id=""
-                                class="btn btn-danger"
-                                href="{% url 'eliminar' libro.id %}"
-                                role="button"
-                                >Borrar</a
-                            >
-                                </td>
-                            </tr>
-                            {% endfor %}
+                                class="btn btn-info"
+                                href="{% url 'editarcuentas' %}"
+                                role="button">Editar</a>
                             </td>
+                            <td>
+                                <button class="btn btn-danger" onclick="confirmarEliminacion('{{ historia.id }}', '{{ historia.username }}', '{{ historia.numero }}')">Borrar</button>
+                            </td>                            
                         </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
-            
         </div>
-        <div class="card-footer text-muted">Footer</div>
+        <a
+            name=""
+            id=""
+            class="btn btn-primary"
+            href="{% url 'dashboardDoc' %}"
+            role="button"
+            >Volver</a>
+        
     </div>
-    
+
+    <!-- Modal de confirmación -->
+    <div id="confirmarModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <p>¿Estás seguro de que deseas eliminar la historia de <strong id="historiaUsername"></strong> (Número: <strong id="historiaNumero"></strong>)?</p>
+            <form id="formEliminar" method="POST" action="">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+                <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/historias.js' %}"></script>
 {% endblock %}
