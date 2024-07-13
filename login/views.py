@@ -6,12 +6,29 @@ from django.contrib.auth.decorators import login_required
 from .models import UserProfile, Valoracion
 from django.http import JsonResponse
 from .forms import ValoracionForm, UserForm
-
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.urls import reverse
+from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
+from django.urls import reverse_lazy
+
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'registration/password_reset_form.html'
+    email_template_name = 'registration/password_reset_email.html'
+    success_url = reverse_lazy('password_reset_done')
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'registration/password_reset_done.html'
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'registration/password_reset_confirm.html'
+    success_url = reverse_lazy('password_reset_complete')
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'registration/password_reset_complete.html'
+
 
 def forgot_password(request):
     if request.method == 'POST':
@@ -178,7 +195,10 @@ def signout(request):
 
 @login_required()
 def dashboard(request):
-    return render(request, 'dashboard.html', {'user': request.user})
+    if request.user.is_authenticated:
+        return render(request, 'dashboard.html', {'user': request.user})
+    else:
+        return redirect('loginregister')
 
 @login_required()
 def dashboardDoc(request):
@@ -189,23 +209,14 @@ def dashboardDoc(request):
 
 @login_required()
 def configuracion(request, id):
-    # Obtener el UserProfile
     perfil_usuario = UserProfile.objects.get(id=id)
-    print(perfil_usuario)
-    # Verificar permisos: solo el usuario dueño del perfil o un superusuario pueden editar
-    if not (request.user.is_superuser or request.user == perfil_usuario.user):
-        # Si el usuario no es superusuario ni el dueño del perfil, redirigir o mostrar un mensaje de error
-        return redirect('pagina_de_error')  # Reemplaza 'pagina_de_error' con la URL o nombre de la vista de tu elección
-    
     if request.method == 'POST':
         form = UserForm(request.POST, request.FILES, instance=perfil_usuario)
         if form.is_valid():
             form.save()
-            return redirect('listcuentas')  # Redirige a la lista de cuentas después de guardar
+            return redirect('listcuentas') 
     else:
         form = UserForm(instance=perfil_usuario)
-        
-    # Renderizar el template con el formulario apropiado
     return render(request, 'configuracion.html', {'form': form})
 
 @login_required()
