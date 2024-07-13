@@ -2,7 +2,7 @@
 
 {% load static %}
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/dashboardDoc.css' %}?v1.2">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v1.2">
 {% endblock %}
 
 {% block content %}
@@ -41,9 +41,9 @@
             </div>
             <div class="col-12 help-text">{{ field.errors }}</div>
             {% endfor %}
-            
+            <a class="btn btn-primary" href="{% url 'cambiar_password' %}" role="button">Cambiar Contraseña</a>
             <button type="submit" class="btn btn-success">Guardar</button>
-            <a class="btn btn-warning" href="{% url 'listcuentas' %}" role="button">Volver</a>
+            <a class="btn btn-warning" href="{% url 'listcuentas' %}" onclick="event.preventDefault(); history.back();" role="button">Volver</a>
         </form>
     </div>
 </div>

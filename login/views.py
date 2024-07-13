@@ -11,6 +11,31 @@ from django.utils.encoding import force_bytes, force_str
 from django.urls import reverse
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
+
+def es_superusuario(user):
+    return user.is_superuser
+
+def acceso_denegado(request):
+    return render(request, 'acceso_denegado.html')
+
+@login_required
+def cambiar_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Importante para mantener la sesión del usuario
+            messages.success(request, 'Tu contraseña ha sido actualizada con éxito!')
+            return redirect('dashboard')  # O la página que prefieras
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'cambiar_password.html', {
+        'form': form
+    })
 
 def registrarme(request):
     error_message = None
@@ -51,10 +76,7 @@ def registrarme(request):
             user = authenticate(request, username=numero, password=password)
             if user is not None:
                 login(request, user)
-                if user.is_superuser:
-                    return redirect('dashboardDoc')
-                else:
-                    return redirect('dashboard')
+                return redirect('dashboard')
             else:
                 error_message = 'Credenciales inválidas'
 
@@ -72,6 +94,7 @@ def listhistorias(request):
         historias = Valoracion.objects.filter(user=request.user)
     return render(request, 'historiaclinica/listhistorias.html', {'historias': historias})
 
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required
 def verhistorias(request, id):
     historia = Valoracion.objects.select_related('user').get(id=id)
@@ -95,6 +118,7 @@ def fetch_user_details(request):
             return JsonResponse(data)
     return JsonResponse({}, status=404)
 
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required
 def eliminarhistorias(request, id):
     historiaseliminar = get_object_or_404(Valoracion, id=id)
@@ -105,6 +129,7 @@ def eliminarhistorias(request, id):
     
     return redirect('listhistorias')
 
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required
 def crearhistorias(request):
     if request.method == 'POST':
@@ -158,13 +183,6 @@ def dashboard(request):
         return redirect('loginregister')
 
 @login_required()
-def dashboardDoc(request):
-    if request.user.is_authenticated:
-        return render(request, 'dashboardDoc.html', {'user': request.user})
-    else:
-        return redirect('loginregister')
-
-@login_required()
 def configuracion(request, id):
     perfil_usuario = UserProfile.objects.get(id=id)
     if request.method == 'POST':
@@ -188,6 +206,7 @@ def listcitas(request):
 def editarcitas(request):
     return render(request, 'citas/editarcitas.html')
 
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
 def crearcuentas(request):
     if request.method == 'POST':
@@ -200,11 +219,13 @@ def crearcuentas(request):
     
     return render(request, 'cuentas/crearcuentas.html', {'form': form})
 
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required
 def listcuentas(request):
     cuentas= UserProfile.objects.all()
     return render(request, 'cuentas/listcuentas.html', {'cuentas': cuentas})
 
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required
 def editarcuentas(request, id):
     form_edcuentas = UserProfile.objects.get(id=id)
@@ -217,6 +238,7 @@ def editarcuentas(request, id):
         form = UserForm(instance=form_edcuentas)
     return render(request, 'cuentas/editarcuentas.html', {'form': form})
 
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
 def crearfechas(request):
     return render(request, 'fechas/crearfechas.html')
@@ -225,18 +247,22 @@ def crearfechas(request):
 def listfechas(request):
     return render(request, 'fechas/listfechas.html')
 
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
 def editarfechas(request):
     return render(request, 'fechas/editarfechas.html')
 
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
 def crearelemento(request):
     return render(request, 'inventario/crearelemento.html')
 
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
 def listelemento(request):
     return render(request, 'inventario/listelemento.html')
 
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
 def editarelemento(request):
     return render(request, 'inventario/editarelemento.html')

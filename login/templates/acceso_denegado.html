@@ -1,0 +1,58 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}Acceso Denegado{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    h1{
+        color: #000000;
+    }
+    .error-template {
+        padding: 40px 15px;
+        text-align: center;
+    }
+    .error-actions {
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+    .error-actions .btn {
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="error-template">
+                <h1>
+                    <i class="fas fa-exclamation-triangle text-warning"></i> Oops!
+                </h1>
+                <h2>403 - Acceso Denegado</h2>
+                <div class="error-details mb-3">
+                    Lo sentimos, no tienes permiso para acceder a esta página.
+                </div>
+                <div class="error-actions">
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-home"></i> Volver al Dashboard
+                    </a>
+                </div>
+                <hr>
+                <div class="mt-4 alert alert-info" role="alert">
+                    <h4 class="alert-heading">¿Necesitas ayuda?</h4>
+                    <p>Si crees que deberías tener acceso a esta página, por favor contacta al administrador del sistema.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+{% endblock %}

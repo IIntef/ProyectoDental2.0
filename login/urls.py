@@ -5,13 +5,13 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('', views.inicio, name='inicio'),
     path('base/', views.base, name="base"),
-    path('dashboardDoc/', views.dashboardDoc, name="dashboardDoc"),
     path('loginregister/', views.registrarme, name="loginregister"),
     path('dashboard/', views.dashboard, name="dashboard"),
     path('signout/', views.signout, name="signout"),
     path('configuracion/<int:id>/', views.configuracion, name="configuracion"),
     path('correo/', views.correo, name="correo"),
     path('calendario/', views.calendario, name="calendario"),
+    path('acceso-denegado/', views.acceso_denegado, name='acceso_denegado'),
     
     path('crear-citas/', views.crearcitas, name="crearcitas"),
     path('editar-citas/<int:id>', views.editarcitas, name="editarcitas"),
@@ -42,4 +42,6 @@ urlpatterns = [
     path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
     path('password_reset_confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
     path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
+
+    path('cambiar-password/', views.cambiar_password, name='cambiar_password'),
 ]
