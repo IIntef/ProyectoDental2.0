@@ -20,11 +20,7 @@
         <form action="" method="POST">
           {% csrf_token %}
           <h1>Crear Cuenta</h1>
-          <div class="social-container">
-            <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="social"><i class="fab fa-google"></i></a>
-            <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-          </div>
+          <br>
           <span>
             O usa tu gmail para registrarte
           </span>
@@ -50,11 +46,7 @@
         <form action="" method="POST">
           {% csrf_token %}
           <h1>Iniciar Sesión</h1>
-          <div class="social-container">
-            <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="social"><i class="fab fa-google"></i></a>
-            <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-          </div>
+          <br>
           <span>Usa tu cuenta</span>
           {% if error %}
             <p style="color:red;">{{ error }}</p>
@@ -64,7 +56,7 @@
           {% endif %}
           <input type="number" id="numer" name="numer" placeholder="No. Documento" required/>
           <input type="password" id="contra" name="contra" placeholder="Contraseña" required/>
-          <a href="#"><i>¿Olvidó su contraseña?</i></a>
+          <a href="{% url 'forgot_password' %}"><i>¿Olvidó su contraseña?</i></a>
           <button>Ingresar</button>
         </form>
       </div>

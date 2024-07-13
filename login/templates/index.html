@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DENTAL LAB - S.G</title>
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}?v1.2">
   {% block extra_css %}
   {% endblock %}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -24,7 +24,7 @@
         <nav class="navbar">
           <ul class="navbar-list">
               <li class="profile-dropdown-list-item">
-                <a href="{% url 'configuracion' id=request.user.userprofile.id %}">
+                <a href="{% url 'configuracion' id=user.id %}">
                   <i class="fa-regular fa-user"></i>
                   <span>Editar Perfil</span>
                 </a>
@@ -55,7 +55,12 @@
           <div class="profile-dropdown">
             <div onclick="toggle()" class="profile-dropdown-btn">
               <div class="profile-img">
-                <i class="fa-solid fa-circle"></i>
+                {% if user.imagen %}
+                <img src="{{ user.imagen.url }}" alt="Imagen de perfil">
+                {% else %}
+                  <i class="fa-solid fa-user"></i>
+                {% endif %}
+                <i class="fa-solid fa-circle status-icon"></i>
               </div>
     
               <span>

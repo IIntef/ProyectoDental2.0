@@ -7,6 +7,37 @@ from .models import UserProfile, Valoracion
 from django.http import JsonResponse
 from .forms import ValoracionForm, UserForm
 
+from django.core.mail import send_mail
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.urls import reverse
+
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        user = UserProfile.objects.filter(email=email).first()
+        if user:
+            # Generar token
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            # Construir URL de restablecimiento
+            reset_url = request.build_absolute_uri(
+                reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
+            )
+            # Enviar email
+            send_mail(
+                'Restablecimiento de contraseña',
+                f'Usa este enlace para restablecer tu contraseña: {reset_url}',
+                'noreply@tudominio.com',
+                [email],
+                fail_silently=False,
+            )
+            return render(request, 'forgot_password.html', {'message': 'Se ha enviado un correo con instrucciones.'})
+        else:
+            return render(request, 'forgot_password.html', {'error': 'No se encontró un usuario con ese correo.'})
+    return render(request, 'forgot_password.html')
+
 def registrarme(request):
     error_message = None
     success_message = None
@@ -147,17 +178,20 @@ def signout(request):
 
 @login_required()
 def dashboard(request):
-    return render(request, 'dashboard.html')
+    return render(request, 'dashboard.html', {'user': request.user})
 
 @login_required()
 def dashboardDoc(request):
-    return render(request, 'dashboardDoc.html')
+    if request.user.is_authenticated:
+        return render(request, 'dashboardDoc.html', {'user': request.user})
+    else:
+        return redirect('loginregister')
 
 @login_required()
 def configuracion(request, id):
     # Obtener el UserProfile
     perfil_usuario = UserProfile.objects.get(id=id)
-    
+    print(perfil_usuario)
     # Verificar permisos: solo el usuario dueño del perfil o un superusuario pueden editar
     if not (request.user.is_superuser or request.user == perfil_usuario.user):
         # Si el usuario no es superusuario ni el dueño del perfil, redirigir o mostrar un mensaje de error
