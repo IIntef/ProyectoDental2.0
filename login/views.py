@@ -1,59 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.db import IntegrityError
-from .models import *
-from django.contrib.auth.decorators import login_required
 from .models import UserProfile, Valoracion
-from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 from .forms import ValoracionForm, UserForm
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
 from django.urls import reverse
-from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
-from django.urls import reverse_lazy
-
-class CustomPasswordResetView(PasswordResetView):
-    template_name = 'registration/password_reset_form.html'
-    email_template_name = 'registration/password_reset_email.html'
-    success_url = reverse_lazy('password_reset_done')
-
-class CustomPasswordResetDoneView(PasswordResetDoneView):
-    template_name = 'registration/password_reset_done.html'
-
-class CustomPasswordResetConfirmView(PasswordResetConfirmView):
-    template_name = 'registration/password_reset_confirm.html'
-    success_url = reverse_lazy('password_reset_complete')
-
-class CustomPasswordResetCompleteView(PasswordResetCompleteView):
-    template_name = 'registration/password_reset_complete.html'
-
-
-def forgot_password(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        user = UserProfile.objects.filter(email=email).first()
-        if user:
-            # Generar token
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            # Construir URL de restablecimiento
-            reset_url = request.build_absolute_uri(
-                reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
-            )
-            # Enviar email
-            send_mail(
-                'Restablecimiento de contraseña',
-                f'Usa este enlace para restablecer tu contraseña: {reset_url}',
-                'noreply@tudominio.com',
-                [email],
-                fail_silently=False,
-            )
-            return render(request, 'forgot_password.html', {'message': 'Se ha enviado un correo con instrucciones.'})
-        else:
-            return render(request, 'forgot_password.html', {'error': 'No se encontró un usuario con ese correo.'})
-    return render(request, 'forgot_password.html')
+from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
 
 def registrarme(request):
     error_message = None

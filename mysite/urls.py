@@ -19,12 +19,13 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 from login import views
+from django.urls import path
+from django.contrib.auth import views as auth_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('login.urls')),
-    path('', include('libreria.urls')),  
-    path('accounts/', include('django.contrib.auth.urls')),   
+    path('', include('libreria.urls')), 
 ]
 
 if settings.DEBUG:
