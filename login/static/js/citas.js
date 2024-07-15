@@ -59,19 +59,32 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function confirmarEliminacion(id) {
-    const actionUrl = `/eliminarcitas/${id}/`;
-    document.getElementById('formEliminar').action = actionUrl;
-    document.getElementById('confirmarModal').style.display = 'block';
-}
-
-function cerrarModal() {
-    document.getElementById('confirmarModal').style.display = 'none';
-}
-
-window.onclick = function(event) {
-    if (event.target == document.getElementById('confirmarModal')) {
-        cerrarModal();
+function confirmarCancelacion(citaId) {
+    if (confirm('¿Estás seguro de cancelar el agendamiento de esta cita?')) {
+        // Enviar una solicitud POST al servidor para actualizar la asistencia
+        const url = `/cancelar-cita/${citaId}/`;
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({
+                estado: 'cancelada'  // Estado deseado al actualizar la asistencia
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Asistencia cancelada exitosamente.');
+                location.reload();  // Recargar la página después de la actualización
+            } else {
+                alert('Ocurrió un error al actualizar la asistencia.');
+            }
+        })
+        .catch(error => {
+            console.error('Error en la solicitud:', error);
+            alert('Ocurrió un error en la solicitud.');
+        });
     }
 }
 

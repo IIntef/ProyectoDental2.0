@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.db import IntegrityError
 from .models import UserProfile, Valoracion, Inventario, Fecha, Cita
 from django.contrib.auth.decorators import login_required
-from .forms import ValoracionForm, UserForm, InventarioForm, FechaForm, CitaForm, ActualizarAsistenciaForm
+from .forms import ValoracionForm, UserForm, InventarioForm, FechaForm, CitaForm
 from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -207,29 +207,33 @@ def crearcitas(request):
         messages.error(request, 'No se encontró el perfil de usuario.')
         return redirect('listcitas')
 
-    cita_existente = Cita.objects.filter(paciente=user_profile, estado='programada').exists()
-    if cita_existente and not request.user.is_superuser:
+    cita_programada = Cita.objects.filter(paciente=user_profile, estado='programada').exists()
+
+    if cita_programada and not request.user.is_superuser:
         messages.error(request, 'Ya tienes una cita programada.')
         return redirect('listcitas')
 
     if request.method == 'POST':
         formulario = CitaForm(request.POST)
+        
         if formulario.is_valid():
             cita = formulario.save(commit=False)
+            print(user_profile.numero)
             if not request.user.is_superuser:
                 cita.paciente = user_profile
+                print(cita.paciente)
             cita.save()
             messages.success(request, 'Cita creada exitosamente.')
             return redirect('listcitas')
         else:
-            messages.error(request, 'El usuario ya tiene una cita programada')
+            messages.error(request, 'Hubo un problema al crear la cita.')
             print("Errores en formulario:", formulario.errors)
     else:
         formulario = CitaForm()
 
     contexto = {
         'form': formulario,
-        'titulo_formulario': 'Crear Cita' if not cita_existente else 'Editar Cita',
+        'titulo_formulario': 'Crear Cita' if not cita_programada else 'Editar Cita',
         'is_superuser': request.user.is_superuser,
     }
     return render(request, 'citas/crearcitas.html', contexto)
@@ -272,13 +276,16 @@ def editarcitas(request, id):
         form = CitaForm(instance=cita)
     return render(request, 'citas/editarcitas.html', {'form': form})
 
-@login_required
-def eliminarcitas(request, id):
+@login_required()
+@require_POST
+def cancelar_asistencia(request, id):
     cita = get_object_or_404(Cita, id=id)
-    if request.method == 'POST':
-        cita.delete()
-        return redirect('listcitas')
-    return redirect('listcitas')
+    
+    cita.estado = 'Cancelada'
+    cita.save()
+
+    return HttpResponse(status=200)
+
 
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()

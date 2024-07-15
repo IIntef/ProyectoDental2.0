@@ -40,7 +40,7 @@
                             <a href="{% url 'editarcitas' cita.id %}" class="btn btn-warning">Reagendar Cita</a>
 
                             <button class="btn btn-danger"
-                                onclick="confirmarEliminacion('{{ cita.id }}')">Eliminar Cita</button>
+                                onclick="confirmarCancelacion('{{ cita.id }}')">Cancelar Cita</button>
 
                             {% if user.is_superuser %}
                             <button class="btn btn-info"
@@ -56,21 +56,8 @@
     <a class="btn btn-primary" href="{% url 'dashboard' %}" role="button">Volver</a>
 </div>
 
-<!-- Modal de confirmación -->
-<div id="confirmarModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="cerrarModal()">&times;</span>
-        <p>¿Estás seguro de que deseas cancelar la cita?</p>
-        <form id="formEliminar" method="POST" action="">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Cancelar Cita</button>
-            <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
-        </form>
-    </div>
-</div>
-
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/citas.js' %}?v1.5"></script>
+<script src="{% static 'js/citas.js' %}?v1.6"></script>
 {% endblock %}

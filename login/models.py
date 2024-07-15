@@ -166,6 +166,4 @@ class Cita(models.Model):
     def save(self, *args, **kwargs):
         if self.asistio:
             self.estado = 'completada'
-        if self.paciente:
-            self.numero = self.paciente 
         super().save(*args, **kwargs)

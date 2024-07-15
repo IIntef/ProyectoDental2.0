@@ -74,7 +74,7 @@ class CitaForm(forms.ModelForm):
         if 'initial' in kwargs and kwargs['initial'].get('paciente') is None:
             self.fields.pop('paciente', None)
         else:
-            self.fields['paciente'] = forms.ChoiceField(choices=self.get_pacientes_choices())
+            self.fields['paciente'] = forms.ChoiceField(choices=self.get_pacientes_choices(), required=False)
 
     def get_pacientes_choices(self):
         pacientes = UserProfile.objects.filter(is_active=True)
@@ -117,12 +117,3 @@ class CitaForm(forms.ModelForm):
         return cita
 
 
-
-
-class ActualizarAsistenciaForm(forms.ModelForm):
-    class Meta:
-        model = Cita
-        fields = ['asistio']
-        widgets = {
-            'asistio': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
