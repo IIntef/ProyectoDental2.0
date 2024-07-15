@@ -10,3 +10,4 @@ class login(AppConfig):
 
     def ready(self):
         import login.signals
+        import login.models

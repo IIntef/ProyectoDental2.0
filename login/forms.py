@@ -54,11 +54,6 @@ class FechaForm(forms.ModelForm):
             'hora': forms.TimeInput(attrs={'type': 'time'}),
         }
 
-from django import forms
-from .models import Cita, Fecha, UserProfile
-
-from django import forms
-from .models import Cita, Fecha, UserProfile
 
 class CitaForm(forms.ModelForm):
     fecha = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
@@ -70,35 +65,24 @@ class CitaForm(forms.ModelForm):
         fields = ['fecha', 'hora', 'motivo', 'paciente']
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)  # Obtén el usuario de kwargs
         super().__init__(*args, **kwargs)
-        if 'initial' in kwargs and kwargs['initial'].get('paciente') is None:
-            self.fields.pop('paciente', None)
-        else:
-            self.fields['paciente'] = forms.ChoiceField(choices=self.get_pacientes_choices(), required=False)
 
-    def get_pacientes_choices(self):
-        pacientes = UserProfile.objects.filter(is_active=True)
-        choices = [(perfil.numero, perfil.username) for perfil in pacientes]
-        return choices
+        if not self.user:
+            raise ValueError('Se requiere un usuario para inicializar este formulario.')
+
+        if not self.user.is_superuser:
+            self.fields['paciente'] = forms.ModelChoiceField(
+                queryset=UserProfile.objects.filter(numero=self.user.numero, is_active=True),
+                required=False
+            )
 
     def clean(self):
         cleaned_data = super().clean()
-        paciente_numero = cleaned_data.get('paciente')
+        paciente = cleaned_data.get('paciente')
 
-        # Verificar si se seleccionó un paciente
-        if paciente_numero:
-            try:
-                paciente = UserProfile.objects.get(numero=paciente_numero, is_active=True)
-                cleaned_data['paciente'] = paciente
-            except UserProfile.DoesNotExist:
-                self.add_error('paciente', 'El paciente seleccionado no existe o no está activo.')
-
-        # Verificar si el paciente ya tiene una cita programada
-        if 'paciente' in cleaned_data:
-            paciente = cleaned_data['paciente']
-            cita_existente = Cita.objects.filter(paciente=paciente, estado='programada').exists()
-            if cita_existente:
-                self.add_error('paciente', 'El paciente ya tiene una cita programada.')
+        if paciente and not paciente.is_active:
+            raise forms.ValidationError('El paciente seleccionado no está activo.')
 
         return cleaned_data
 
@@ -109,11 +93,14 @@ class CitaForm(forms.ModelForm):
         fecha_hora, created = Fecha.objects.get_or_create(fecha=fecha, hora=hora)
         cita.fecha_hora = fecha_hora
 
+        if not cita.id:  # Solo marca como no disponible si es una nueva cita
+            fecha_hora.disponible = False
+            fecha_hora.save()
+
         if 'paciente' in self.cleaned_data:
             cita.paciente = self.cleaned_data['paciente']
 
         if commit:
             cita.save()
+
         return cita
-
-

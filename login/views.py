@@ -19,6 +19,7 @@ from django.shortcuts import get_object_or_404, HttpResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import user_passes_test
 from .models import Cita
+from django.views.decorators.http import require_GET, require_POST
  
 def es_superusuario(user):
     return user.is_superuser
@@ -199,6 +200,17 @@ def configuracion(request, id):
         form = UserForm(instance=perfil_usuario)
     return render(request, 'configuracion.html', {'form': form})
 
+@login_required
+def cancelar_cita(request, cita_id):
+    if request.method == 'POST':
+        cita = get_object_or_404(Cita, id=cita_id)
+        cita.cancelar_cita()  # Asumiendo que tienes un método 'cancelar' en tu modelo Cita
+        messages.success(request, 'Cita cancelada exitosamente.')
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
 @login_required()
 def crearcitas(request):
     try:
@@ -214,14 +226,13 @@ def crearcitas(request):
         return redirect('listcitas')
 
     if request.method == 'POST':
-        formulario = CitaForm(request.POST)
-        
+        formulario = CitaForm(request.POST, user=request.user)
         if formulario.is_valid():
             cita = formulario.save(commit=False)
-            print(user_profile.numero)
+
             if not request.user.is_superuser:
                 cita.paciente = user_profile
-                print(cita.paciente)
+            
             cita.save()
             messages.success(request, 'Cita creada exitosamente.')
             return redirect('listcitas')
@@ -229,7 +240,7 @@ def crearcitas(request):
             messages.error(request, 'Hubo un problema al crear la cita.')
             print("Errores en formulario:", formulario.errors)
     else:
-        formulario = CitaForm()
+        formulario = CitaForm(user=request.user)
 
     contexto = {
         'form': formulario,
@@ -239,21 +250,31 @@ def crearcitas(request):
     return render(request, 'citas/crearcitas.html', contexto)
 
 @login_required
+@require_POST
+def confirmar_actualizacion_cita(request, cita_id):
+    cita = get_object_or_404(Cita, pk=cita_id)
+    cita.confirmar_actualizacion()
+    return JsonResponse({'message': 'Cita actualizada correctamente'}, status=200)
+
+@login_required
+@require_GET
 def get_horas_disponibles(request):
     fecha = request.GET.get('fecha')
     if fecha:
-        # Obtén todas las fechas para este día
-        fechas_disponibles = Fecha.objects.filter(fecha=fecha)
-        # Obtén las citas ya programadas para este día
-        citas_programadas = Cita.objects.filter(fecha_hora__fecha=fecha)
-        
-        # Crea un conjunto de horas disponibles
-        horas_disponibles = set(fecha.hora.strftime('%H:%M') for fecha in fechas_disponibles)
-        # Elimina las horas que ya están ocupadas
-        horas_ocupadas = set(cita.fecha_hora.hora.strftime('%H:%M') for cita in citas_programadas)
-        horas_disponibles -= horas_ocupadas
-        
-        return JsonResponse(list(horas_disponibles), safe=False)
+        try:
+            # Filtra las fechas disponibles para la fecha específica
+            fechas_disponibles = Fecha.objects.filter(fecha=fecha, disponible=True)
+            # Obtén las horas ya ocupadas para esa fecha
+            citas_programadas = Cita.objects.filter(fecha_hora__fecha=fecha, estado='programada')
+            horas_ocupadas = set(cita.fecha_hora.hora.strftime('%H:%M') for cita in citas_programadas)
+            # Crea un conjunto de horas disponibles
+            horas_disponibles = set(fecha_hora.hora.strftime('%H:%M') for fecha_hora in fechas_disponibles)
+            # Filtra las horas disponibles excluyendo las ocupadas
+            horas_disponibles -= horas_ocupadas
+            return JsonResponse(list(horas_disponibles), safe=False)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    # Si no se proporciona una fecha válida, devuelve una lista vacía
     return JsonResponse([], safe=False)
 
 @login_required()
@@ -264,28 +285,23 @@ def listcitas(request):
         citas = Cita.objects.filter(paciente=request.user)
     return render(request, 'citas/listcitas.html', {'citas': citas})
 
-@login_required()
+@login_required
 def editarcitas(request, id):
     cita = get_object_or_404(Cita, id=id)
+    
     if request.method == 'POST':
         form = CitaForm(request.POST, instance=cita)
         if form.is_valid():
             form.save()
             return redirect('listcitas')
     else:
-        form = CitaForm(instance=cita)
-    return render(request, 'citas/editarcitas.html', {'form': form})
-
-@login_required()
-@require_POST
-def cancelar_asistencia(request, id):
-    cita = get_object_or_404(Cita, id=id)
+        form = CitaForm(instance=cita, user=request.user)  # Pasa request.user al inicializar el formulario
     
-    cita.estado = 'Cancelada'
-    cita.save()
-
-    return HttpResponse(status=200)
-
+    context = {
+        'form': form,
+        'cita': cita,
+    }
+    return render(request, 'citas/editarcitas.html', context)
 
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()

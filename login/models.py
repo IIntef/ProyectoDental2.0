@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 class UserProfileManager(BaseUserManager):
     def create_user(self, numero, username, email, password=None, tipo=2):
@@ -135,6 +137,7 @@ class Cita(models.Model):
 class Fecha(models.Model):
     fecha = models.DateField()
     hora = models.TimeField()
+    disponible = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ('fecha', 'hora')
@@ -160,6 +163,20 @@ class Cita(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='programada')
     asistio = models.BooleanField(default=False)
 
+    def cancelar_cita(self):
+        if self.estado == 'programada':
+            self.estado = 'cancelada'
+            self.fecha_hora.disponible = True  # Marcar la fecha y hora como disponible
+            self.fecha_hora.save()  # Guardar los cambios en la fecha_hora
+            self.save()  # Guardar los cambios en la cita
+
+    def confirmar_actualizacion(self):
+        if self.estado == 'programada':
+            self.estado = 'completada'
+            self.fecha_hora.disponible = False  # Marcar la fecha y hora como no disponible
+            self.fecha_hora.save()  # Guardar los cambios en la fecha_hora
+            self.save()  # Guardar los cambios en la cita
+
     def __str__(self):
         return f"Cita de {self.paciente} el {self.fecha_hora}"
 
@@ -167,3 +184,15 @@ class Cita(models.Model):
         if self.asistio:
             self.estado = 'completada'
         super().save(*args, **kwargs)
+
+    @receiver(post_save, sender=Cita)
+    @receiver(post_delete, sender=Cita)
+    def actualizar_disponibilidad_fecha(sender, instance, **kwargs):
+        fecha_hora = instance.fecha_hora
+        citas_programadas = Cita.objects.filter(fecha_hora=fecha_hora, estado='programada').exists()
+        citas_completadas = Cita.objects.filter(fecha_hora=fecha_hora, estado='completada').exists()
+        citas_canceladas = Cita.objects.filter(fecha_hora=fecha_hora, estado='cancelada').exists()
+
+        # La fecha estará disponible si no hay citas programadas activas
+        fecha_hora.disponible = not (citas_programadas or citas_completadas or citas_canceladas)
+        fecha_hora.save()

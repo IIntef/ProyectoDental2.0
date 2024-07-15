@@ -37,14 +37,13 @@
                         <td>{{ cita.get_motivo_display }}</td>
                         <td>{{ cita.get_estado_display }}</td>
                         <td>
+                            {% if cita.estado == 'programada' %}
                             <a href="{% url 'editarcitas' cita.id %}" class="btn btn-warning">Reagendar Cita</a>
-
-                            <button class="btn btn-danger"
-                                onclick="confirmarCancelacion('{{ cita.id }}')">Cancelar Cita</button>
-
+                            <button class="btn btn-danger cancelar-cita-btn" data-cita-id="{{ cita.id }}">Cancelar
+                                Cita</button>
                             {% if user.is_superuser %}
-                            <button class="btn btn-info"
-                                onclick="confirmarActualizacion('{{ cita.id }}')">Actualizar Asistencia</button>
+                            <button class="btn btn-info confirmar-actualizacion-btn" data-cita-id="{{ cita.id }}">Actualizar Asistencia</button>
+                            {% endif %}
                             {% endif %}
                         </td>
                     </tr>
@@ -59,5 +58,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/citas.js' %}?v1.6"></script>
+<script src="{% static 'js/citas.js' %}?v2.5"></script>
 {% endblock %}

@@ -29,16 +29,17 @@
       {% endfor %}
     </select>
 
-    {% if request.user.is_superuser %}
-  <div class="mb-3">
-    <label for="paciente" class="form-label">Seleccionar Paciente</label>
-    <select class="form-select" name="paciente" id="paciente" required>
-      {% for value, display_name in form.fields.paciente.choices %}
-      <option value="{{ value }}">{{ display_name }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  {% endif %}
+    {% if is_superuser %}
+    <div class="mb-3">
+      <label for="paciente" class="form-label">Seleccionar Paciente</label>
+      <select class="form-select" name="paciente" id="paciente" required>
+        {% for value, display_name in form.fields.paciente.choices %}
+        <option value="{{ value }}">{{ display_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
   </div>
   <button type="submit" class="btn btn-success">Guardar</button>
   <a class="btn btn-warning" href="{% url 'listcitas' %}" role="button">Volver</a>
