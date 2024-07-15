@@ -39,7 +39,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         (3, 'C.E'),
         (4, 'C.I'),
     )
-
+    
     tipo = models.PositiveSmallIntegerField(choices=TIPO_CHOICES, default=2)
     numero = models.PositiveIntegerField(unique=True)
     username = models.CharField(max_length=50)
@@ -138,3 +138,34 @@ class Fecha(models.Model):
 
     class Meta:
         unique_together = ('fecha', 'hora')
+
+    def __str__(self):
+        return f"{self.fecha} {self.hora}"
+
+class Cita(models.Model):
+    ESTADO_CHOICES = (
+        ('programada', 'Programada'),
+        ('completada', 'Completada'),
+        ('cancelada', 'Cancelada'),
+    )
+
+    MOTIVO_CHOICES = (
+        ('protesis', 'Protesis'),
+        ('ortodoncia', 'Ortodoncia'),
+    )
+
+    paciente = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    fecha_hora = models.ForeignKey(Fecha, on_delete=models.CASCADE)
+    motivo = models.CharField(max_length=20, choices=MOTIVO_CHOICES, default='protesis')
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='programada')
+    asistio = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Cita de {self.paciente} el {self.fecha_hora}"
+
+    def save(self, *args, **kwargs):
+        if self.asistio:
+            self.estado = 'completada'
+        if self.paciente:
+            self.numero = self.paciente 
+        super().save(*args, **kwargs)

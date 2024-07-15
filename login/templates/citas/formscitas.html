@@ -1,120 +1,58 @@
-<form enctype="multipart/form-data" method="POST">
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v1.2">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block content %}
+<form method="POST" id="citaForm">
   {% csrf_token %}
 
-  <div class="seccion">
-    <h4>Datos Básicos</h4>
-    {% for campo in formulario %} {% if campo.name in
-    'tipo,numero,username,email,direccion,edad,ocupacion,celular,fecha_ingreso,acudiente'
-    %}
-    <div class="mb-3">
-      <label for="" class="form-label">{{ campo.label }}</label>
-      {% if campo.name == 'tipo' %}
-      <select class="form-control" name="{{ campo.name }}" id="" required>
-        <option value="1">T.I</option>
-        <option value="2" selected>C.C</option>
-        <option value="3">C.E</option>
-        <option value="4">C.I</option>
-      </select>
-      {% else %}
-      <input
-        type="{{ campo.field.widget.input_type }}"
-        class="form-control"
-        name="{{ campo.name }}"
-        id=""
-        aria-describedby="helpId"
-        placeholder="{{ campo.label }}"
-        value="{{ campo.value|default:'' }}"
-        {%
-        if
-        campo.field.required
-        %}required{%
-        endif
-        %}
-      />
-      {% endif %}
-    </div>
-    <div class="col-12 help-text">{{ campo.errors }}</div>
-    {% endif %} {% endfor %}
+  <div class="mb-3">
+    <label for="fecha" class="form-label">Fecha</label>
+    <input type="text" class="form-control" id="fecha" name="fecha" required>
   </div>
 
-  <div class="seccion">
-    <h4>Anamnesis</h4>
-    {% for campo in formulario %} {% if campo.name in
-    'tratamiento_medicacion,reacciones_alergicas,transtorno_tension_arterial,diabetes,transtornos_emocionales,enfermedad_respiratoria,otros'
-    %}
-    <div class="mb-3">
-      <label for="" class="form-label">{{ campo.label }}</label>
-      {% if campo.name != 'otros' %}
-      <select class="form-control" name="{{ campo.name }}" id="" required>
-        <option value="1">SI</option>
-        <option value="2">NO</option>
-        <option value="3" selected>NO SABE</option>
-      </select>
-      {% else %}
-      <input
-        type="{{ campo.field.widget.input_type }}"
-        class="form-control"
-        name="{{ campo.name }}"
-        id=""
-        aria-describedby="helpId"
-        placeholder="Especifique"
-        value="{{ campo.value|default:'' }}"
-      />
-      {% endif %}
+  <div class="mb-3">
+    <label class="form-label">Hora</label>
+    <div id="hora" class="form-check">
+      <!-- Las opciones se llenarán con JavaScript -->
     </div>
-    <div class="col-12 help-text">{{ campo.errors }}</div>
-    {% endif %} {% endfor %}
   </div>
 
-  <div class="seccion">
-    <h4>Rehabilitación Oral</h4>
-    {% for campo in formulario %} {% if campo.name in
-    'protesis_dental,total,acrilico,flexible,parcial,retenedores,panoramica,periapical'
-    %}
-    <div class="mb-3">
-      <label for="" class="form-label">{{ campo.label }}</label>
-      <input
-        type="{{ campo.field.widget.input_type }}"
-        class="form-control"
-        name="{{ campo.name }}"
-        id=""
-        aria-describedby="helpId"
-        placeholder="Especifique"
-        value="{{ campo.value|default:'' }}"
-      />
-    </div>
-    <div class="col-12 help-text">{{ campo.errors }}</div>
-    {% endif %} {% endfor %}
-  </div>
+  <div class="mb-3">
+    <label for="motivo" class="form-label">Motivo</label>
+    <select class="form-select" name="motivo" id="motivo" required>
+      {% for value, display_name in form.fields.motivo.choices %}
+      <option value="{{ value }}">{{ display_name }}</option>
+      {% endfor %}
+    </select>
 
-  <div class="seccion">
-    <h4>Higiene Oral</h4>
-    {% for campo in formulario %} {% if campo.name in
-    'cepillado_dental,seda_dental,enjuague_bucal' %}
-    <div class="mb-3">
-      <label for="" class="form-label">{{ campo.label }}</label>
-      <select class="form-control" name="{{ campo.name }}" id="" required>
-        <option value="1">SI</option>
-        <option value="2">NO</option>
-      </select>
-    </div>
-    <div class="col-12 help-text">{{ campo.errors }}</div>
-    {% endif %} {% endfor %}
+    {% if request.user.is_superuser %}
+  <div class="mb-3">
+    <label for="paciente" class="form-label">Seleccionar Paciente</label>
+    <select class="form-select" name="paciente" id="paciente" required>
+      {% for value, display_name in form.fields.paciente.choices %}
+      <option value="{{ value }}">{{ display_name }}</option>
+      {% endfor %}
+    </select>
   </div>
-
-  <input
-    type="submit"
-    class="btn btn-success"
-    name=""
-    id=""
-    value="Enviar Información"
-  />
-  <a
-    name=""
-    id=""
-    class="btn btn-warning"
-    href="{% url 'libros' %}"
-    role="button"
-    >Volver</a
-  >
+  {% endif %}
+  </div>
+  <button type="submit" class="btn btn-success">Guardar</button>
+  <a class="btn btn-warning" href="{% url 'listcitas' %}" role="button">Volver</a>
 </form>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{% static 'js/citas.js' %}"></script>
+<script>
+  flatpickr("#fecha", {
+    enableTime: false, // No es necesario si solo se necesita fecha
+    dateFormat: "Y-m-d", // Formato de fecha a enviar al servidor
+    locale: "es", // Configura el idioma
+  });
+</script>
+{% endblock %}

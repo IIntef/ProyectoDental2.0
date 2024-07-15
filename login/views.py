@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.db import IntegrityError
-from .models import UserProfile, Valoracion, Inventario, Fecha
+from .models import UserProfile, Valoracion, Inventario, Fecha, Cita
 from django.contrib.auth.decorators import login_required
-from .forms import ValoracionForm, UserForm, InventarioForm, FechaForm
+from .forms import ValoracionForm, UserForm, InventarioForm, FechaForm, CitaForm, ActualizarAsistenciaForm
 from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -15,7 +15,11 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
-
+from django.shortcuts import get_object_or_404, HttpResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import user_passes_test
+from .models import Cita
+ 
 def es_superusuario(user):
     return user.is_superuser
 
@@ -197,15 +201,97 @@ def configuracion(request, id):
 
 @login_required()
 def crearcitas(request):
-    return render(request, 'citas/crearcitas.html')
+    try:
+        user_profile = UserProfile.objects.get(numero=request.user.numero)
+    except UserProfile.DoesNotExist:
+        messages.error(request, 'No se encontró el perfil de usuario.')
+        return redirect('listcitas')
+
+    cita_existente = Cita.objects.filter(paciente=user_profile, estado='programada').exists()
+    if cita_existente and not request.user.is_superuser:
+        messages.error(request, 'Ya tienes una cita programada.')
+        return redirect('listcitas')
+
+    if request.method == 'POST':
+        formulario = CitaForm(request.POST)
+        if formulario.is_valid():
+            cita = formulario.save(commit=False)
+            if not request.user.is_superuser:
+                cita.paciente = user_profile
+            cita.save()
+            messages.success(request, 'Cita creada exitosamente.')
+            return redirect('listcitas')
+        else:
+            messages.error(request, 'El usuario ya tiene una cita programada')
+            print("Errores en formulario:", formulario.errors)
+    else:
+        formulario = CitaForm()
+
+    contexto = {
+        'form': formulario,
+        'titulo_formulario': 'Crear Cita' if not cita_existente else 'Editar Cita',
+        'is_superuser': request.user.is_superuser,
+    }
+    return render(request, 'citas/crearcitas.html', contexto)
+
+@login_required
+def get_horas_disponibles(request):
+    fecha = request.GET.get('fecha')
+    if fecha:
+        # Obtén todas las fechas para este día
+        fechas_disponibles = Fecha.objects.filter(fecha=fecha)
+        # Obtén las citas ya programadas para este día
+        citas_programadas = Cita.objects.filter(fecha_hora__fecha=fecha)
+        
+        # Crea un conjunto de horas disponibles
+        horas_disponibles = set(fecha.hora.strftime('%H:%M') for fecha in fechas_disponibles)
+        # Elimina las horas que ya están ocupadas
+        horas_ocupadas = set(cita.fecha_hora.hora.strftime('%H:%M') for cita in citas_programadas)
+        horas_disponibles -= horas_ocupadas
+        
+        return JsonResponse(list(horas_disponibles), safe=False)
+    return JsonResponse([], safe=False)
 
 @login_required()
 def listcitas(request):
-    return render(request, 'citas/listcitas.html')
+    if request.user.is_superuser:
+        citas = Cita.objects.all()
+    else:
+        citas = Cita.objects.filter(paciente=request.user)
+    return render(request, 'citas/listcitas.html', {'citas': citas})
 
 @login_required()
-def editarcitas(request):
-    return render(request, 'citas/editarcitas.html')
+def editarcitas(request, id):
+    cita = get_object_or_404(Cita, id=id)
+    if request.method == 'POST':
+        form = CitaForm(request.POST, instance=cita)
+        if form.is_valid():
+            form.save()
+            return redirect('listcitas')
+    else:
+        form = CitaForm(instance=cita)
+    return render(request, 'citas/editarcitas.html', {'form': form})
+
+@login_required
+def eliminarcitas(request, id):
+    cita = get_object_or_404(Cita, id=id)
+    if request.method == 'POST':
+        cita.delete()
+        return redirect('listcitas')
+    return redirect('listcitas')
+
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
+@login_required()
+@require_POST
+@user_passes_test(lambda u: u.is_superuser)  # Asegura que solo el admin pueda actualizar la asistencia
+def actualizar_asistencia(request, cita_id):
+    cita = get_object_or_404(Cita, id=cita_id)
+    
+    # Actualiza el estado de la cita a "Completada"
+    cita.estado = 'completada'
+    cita.save()
+
+    return HttpResponse(status=200)
 
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()

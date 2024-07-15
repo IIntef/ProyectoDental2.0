@@ -1,15 +1,20 @@
-{% extends "bass.html" %}
+{% extends 'index.html' %}
 
-{% block titulo %} CREAR LIBRO {% endblock %}
+{% load static %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v1.2">
+{% endblock %}
 
-{% block contenido %}
+{% block content %}
 <div class="card">
-    <div class="card-header">Crear un Libro</div>
     <div class="card-body">
-        <h4 class="card-title">Datos del libro</h4>
-        {% include 'libros/forms.html' %}
+        <h4 class="card-title">Crear Cita</h4>
+        {% include 'citas/formscitas.html' %}
     </div>
-    <div class="card-footer text-muted">Footer</div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/citas.js' %}?v1.2"></script> 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 {% endblock %}
