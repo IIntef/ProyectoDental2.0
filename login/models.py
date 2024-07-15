@@ -120,3 +120,21 @@ class Inventario(models.Model):
     producto = models.CharField(max_length=150, blank=True) 
     cantidad = models.FloatField(blank=True) 
     estado = models.PositiveSmallIntegerField(choices=ESTADO)
+
+class Cita(models.Model):
+    ESTADO = (
+        (1, 'Disponible'),
+        (2, 'Agotado'),
+        (3, 'Por Recibir'),
+    )
+
+    producto = models.CharField(max_length=150, blank=True) 
+    cantidad = models.FloatField(blank=True) 
+    estado = models.PositiveSmallIntegerField(choices=ESTADO)
+
+class Fecha(models.Model):
+    fecha = models.DateField()
+    hora = models.TimeField()
+
+    class Meta:
+        unique_together = ('fecha', 'hora')

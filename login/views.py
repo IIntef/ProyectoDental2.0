@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.db import IntegrityError
-from .models import UserProfile, Valoracion, Inventario
+from .models import UserProfile, Valoracion, Inventario, Fecha
 from django.contrib.auth.decorators import login_required
-from .forms import ValoracionForm, UserForm, InventarioForm
+from .forms import ValoracionForm, UserForm, InventarioForm, FechaForm
 from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -253,16 +253,45 @@ def eliminarelementos(request, id):
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
 def crearfechas(request):
-    return render(request, 'fechas/crearfechas.html')
-
-@login_required()
-def listfechas(request):
-    return render(request, 'fechas/listfechas.html')
+    if request.method == 'POST':
+        disponibilidad = FechaForm(request.POST)
+        if disponibilidad.is_valid():
+            disponibilidad.save()
+            return redirect('listfechas')
+    else:
+        form = FechaForm()
+    
+    return render(request, 'fechas/crearfechas.html', {'form': form})
 
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
-def editarfechas(request):
-    return render(request, 'fechas/editarfechas.html')
+def listfechas(request):
+    disponibilidades= Fecha.objects.all()
+    return render(request, 'fechas/listfechas.html', {'disponibilidades': disponibilidades})
+
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
+@login_required()
+def editarfechas(request, id):
+    disponibilidad = Fecha.objects.get(id=id)
+    if request.method == 'POST':
+        form = FechaForm(request.POST, instance=disponibilidad)
+        if form.is_valid():
+            form.save()
+            return redirect('listfechas')
+    else:
+        form = FechaForm(instance=disponibilidad)
+    return render(request, 'fechas/editarfechas.html', {'form': form})
+
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
+@login_required
+def eliminarfechas(request, id):
+    fechaseliminar = get_object_or_404(Fecha, id=id)
+    
+    if request.method == 'POST':
+        fechaseliminar.delete()
+        return redirect('listfechas')
+    
+    return redirect('listfechas')
 
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()

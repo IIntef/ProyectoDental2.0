@@ -22,8 +22,9 @@ urlpatterns = [
     path('list-cuentas/', views.listcuentas, name="listcuentas"),
     
     path('crear-fechas/', views.crearfechas, name="crearfechas"),
-    path('editar-fechas/', views.editarfechas, name="editarfechas"),
+    path('editar-fechas/<int:id>', views.editarfechas, name="editarfechas"),
     path('list-fechas/', views.listfechas, name="listfechas"),
+    path('eliminarfechas/<int:id>/', views.eliminarfechas, name="eliminarfechas"),
     
     path('crear-historias/', views.crearhistorias, name="crearhistorias"),
     path('ver-historias/<int:id>', views.verhistorias, name="verhistorias"),

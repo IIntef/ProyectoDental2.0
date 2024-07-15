@@ -1,5 +1,5 @@
 from django import forms
-from .models import UserProfile, Valoracion, Inventario
+from .models import UserProfile, Valoracion, Inventario, Fecha
 from PIL import Image
 
 class UserForm(forms.ModelForm):
@@ -43,3 +43,13 @@ class InventarioForm(forms.ModelForm):
         fields = ['producto', 'cantidad', 'estado']
 
     estado = forms.ChoiceField(choices=Inventario.ESTADO)
+
+
+class FechaForm(forms.ModelForm):
+    class Meta:
+        model = Fecha
+        fields = ['fecha', 'hora']
+        widgets = {
+            'fecha': forms.DateInput(attrs={'type': 'date'}),
+            'hora': forms.TimeInput(attrs={'type': 'time'}),
+        }
