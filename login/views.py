@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.db import IntegrityError
-from .models import UserProfile, Valoracion
+from .models import UserProfile, Valoracion, Inventario
 from django.contrib.auth.decorators import login_required
-from .forms import ValoracionForm, UserForm
+from .forms import ValoracionForm, UserForm, InventarioForm
 from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -136,22 +136,23 @@ def crearhistorias(request):
         numero = request.POST.get('numero')
         user = UserProfile.objects.filter(numero=numero).first()
         
-        if user:
-            formularioI = UserForm(request.POST, instance=user)
-        else:
-            formularioI = UserForm(request.POST)
-        
+        formularioI = UserForm(request.POST)
         formularioII = ValoracionForm(request.POST)
         
-        if formularioI.is_valid() and formularioII.is_valid():
-            user = formularioI.save()
-            valoracion = formularioII.save(commit=False)
-            valoracion.user = user
-            valoracion.save()
-            return redirect('listhistorias')
+        if user:
+            formularioI = UserForm(request.POST, instance=user)
+            if formularioI.is_valid() and formularioII.is_valid():
+                user = formularioI.save()
+                valoracion = formularioII.save(commit=False)
+                valoracion.user = user
+                valoracion.save()
+                messages.success(request, 'Historia clínica creada con éxito.')
+                return redirect('listhistorias')
+            else:
+                print("Errores en formularioI:", formularioI.errors)
+                print("Errores en formularioII:", formularioII.errors)
         else:
-            print("Errores en formularioI:", formularioI.errors)
-            print("Errores en formularioII:", formularioII.errors)
+            messages.error(request, 'El usuario no existe. Por favor, verifique el número ingresado.')
     else:
         formularioI = UserForm()
         formularioII = ValoracionForm()
@@ -189,7 +190,7 @@ def configuracion(request, id):
         form = UserForm(request.POST, request.FILES, instance=perfil_usuario)
         if form.is_valid():
             form.save()
-            return redirect('listcuentas') 
+            return redirect('dashboard') 
     else:
         form = UserForm(instance=perfil_usuario)
     return render(request, 'configuracion.html', {'form': form})
@@ -239,6 +240,17 @@ def editarcuentas(request, id):
     return render(request, 'cuentas/editarcuentas.html', {'form': form})
 
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
+@login_required
+def eliminarelementos(request, id):
+    elementoseliminar = get_object_or_404(Inventario, id=id)
+    
+    if request.method == 'POST':
+        elementoseliminar.delete()
+        return redirect('listelementos')
+    
+    return redirect('listelementos')
+
+@user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
 def crearfechas(request):
     return render(request, 'fechas/crearfechas.html')
@@ -254,18 +266,35 @@ def editarfechas(request):
 
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
-def crearelemento(request):
-    return render(request, 'inventario/crearelemento.html')
+def crearelementos(request):
+    if request.method == 'POST':
+        form = InventarioForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('listelementos')  
+    else:
+        form = InventarioForm()
+    
+    return render(request, 'inventario/crearelementos.html', {'form': form})
 
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
-def listelemento(request):
-    return render(request, 'inventario/listelemento.html')
+def listelementos(request):
+    inventarios= Inventario.objects.all()
+    return render(request, 'inventario/listelementos.html', {'inventarios': inventarios})
 
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
-def editarelemento(request):
-    return render(request, 'inventario/editarelemento.html')
+def editarelementos(request, id):
+    form_edelem = Inventario.objects.get(id=id)
+    if request.method == 'POST':
+        form = InventarioForm(request.POST, request.FILES, instance=form_edelem)
+        if form.is_valid():
+            form.save()
+            return redirect('listelementos') 
+    else:
+        form = InventarioForm(instance=form_edelem)
+    return render(request, 'inventario/editarelementos.html', {'form': form})
 
 @login_required()
 def correo(request):

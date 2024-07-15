@@ -58,3 +58,28 @@ document.addEventListener('click', (event) => {
     profileDropdownBtn.classList.remove('show-caption');
   }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+  const imageInput = document.querySelector('input[name="imagen"]');
+  const profileImage = document.getElementById('profileImage');
+
+  imageInput.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              if (profileImage) {
+                  profileImage.src = e.target.result;
+              } else {
+                  const newImage = document.createElement('img');
+                  newImage.src = e.target.result;
+                  newImage.id = 'profileImage';
+                  newImage.alt = 'Profile Image';
+                  document.querySelector('.profile-img').innerHTML = '';
+                  document.querySelector('.profile-img').appendChild(newImage);
+              }
+          }
+          reader.readAsDataURL(file);
+      }
+  });
+});

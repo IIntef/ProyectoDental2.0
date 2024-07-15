@@ -31,9 +31,10 @@ urlpatterns = [
     path('eliminarhistorias/<int:id>/', views.eliminarhistorias, name="eliminarhistorias"),
 
     
-    path('crear-elemento/', views.crearelemento, name="crearelemento"),
-    path('editar-elemento/', views.editarelemento, name="editarelemento"),
-    path('list-elemento/', views.listelemento, name="listelemento"),
+    path('crear-elementos/', views.crearelementos, name="crearelementos"),
+    path('editar-elementos/<int:id>', views.editarelementos, name="editarelementos"),
+    path('list-elementos/', views.listelementos, name="listelementos"),
+    path('eliminarelementos/<int:id>/', views.eliminarelementos, name="eliminarelementos"),
     
     path('fetch-user-details/', views.fetch_user_details, name='fetch_user_details'),
 

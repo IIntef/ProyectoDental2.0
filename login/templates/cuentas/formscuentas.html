@@ -11,6 +11,12 @@
         {% endif %}
         
         {% if field.name == 'tipo' %}
+        <select class="form-select" naame="{{ field.name }}" id="{{ field.id_for_label }}">
+            {% for value, display_name in field.field.choices %}
+            <option value="{{ value }}" {% if value == field.value %}selected{% endif %}>{{ display_name }}</option>
+            {% endfor %}
+        </select>
+        {% elif field.field.choices %}
         <select class="form-select" name="{{ field.name }}" id="{{ field.id_for_label }}">
             {% for value, display_name in field.field.choices %}
             <option value="{{ value }}" {% if value == field.value %}selected{% endif %}>{{ display_name }}</option>
@@ -23,12 +29,13 @@
                id="{{ field.id_for_label }}"
                aria-describedby="helpId"
                placeholder="{{ field.label }}"
-               value="{{ field.value | default_if_none:'' }}"
+               value="{% if field.value %}{{ field.value }}{% endif %}"
                {% if field.field.required %}required{% endif %}
                {% if field.field.widget.attrs %}{{ field.field.widget.attrs|safe }}{% endif %}>
         {% endif %}
+        
+        <div class="col-12 help-text">{{ field.errors }}</div>
     </div>
-    <div class="col-12 help-text">{{ field.errors }}</div>
     {% endfor %}
     
     <button type="submit" class="btn btn-success">Guardar</button>

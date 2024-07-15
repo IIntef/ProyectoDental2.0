@@ -109,3 +109,14 @@ class Valoracion(models.Model):  # Changed to PascalCase
     def __str__(self):
         return f"Valoración de {self.username} (Número: {self.numero})"
     
+
+class Inventario(models.Model):
+    ESTADO = (
+        (1, 'Disponible'),
+        (2, 'Agotado'),
+        (3, 'Por Recibir'),
+    )
+
+    producto = models.CharField(max_length=150, blank=True) 
+    cantidad = models.FloatField(blank=True) 
+    estado = models.PositiveSmallIntegerField(choices=ESTADO)
