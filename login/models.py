@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.utils import timezone
 
 class UserProfileManager(BaseUserManager):
     def create_user(self, numero, username, email, password=None, tipo=2):
@@ -123,17 +124,6 @@ class Inventario(models.Model):
     cantidad = models.FloatField(blank=True) 
     estado = models.PositiveSmallIntegerField(choices=ESTADO)
 
-class Cita(models.Model):
-    ESTADO = (
-        (1, 'Disponible'),
-        (2, 'Agotado'),
-        (3, 'Por Recibir'),
-    )
-
-    producto = models.CharField(max_length=150, blank=True) 
-    cantidad = models.FloatField(blank=True) 
-    estado = models.PositiveSmallIntegerField(choices=ESTADO)
-
 class Fecha(models.Model):
     fecha = models.DateField()
     hora = models.TimeField()
@@ -144,6 +134,29 @@ class Fecha(models.Model):
 
     def __str__(self):
         return f"{self.fecha} {self.hora}"
+
+    def save(self, *args, **kwargs):
+        now = timezone.now()
+        fecha_hora = timezone.make_aware(timezone.datetime.combine(self.fecha, self.hora))
+        
+        if self.fecha < now.date():
+            self.disponible = False
+        elif self.fecha == now.date():
+            self.disponible = self.hora > now.time()
+        else:
+            self.disponible = True
+        
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def actualizar_disponibilidad(cls):
+        now = timezone.now()
+        cls.objects.filter(fecha__lt=now.date()).update(disponible=False)
+        cls.objects.filter(fecha=now.date(), hora__lte=now.time()).update(disponible=False)
+        cls.objects.filter(
+            models.Q(fecha__gt=now.date()) | 
+            models.Q(fecha=now.date(), hora__gt=now.time())
+        ).update(disponible=True)
 
 class Cita(models.Model):
     ESTADO_CHOICES = (
@@ -186,14 +199,4 @@ class Cita(models.Model):
             self.estado = 'completada'
         super().save(*args, **kwargs)
 
-    @receiver(post_save, sender=Cita)
-    @receiver(post_delete, sender=Cita)
-    def actualizar_disponibilidad_fecha(sender, instance, **kwargs):
-        fecha_hora = instance.fecha_hora
-        citas_programadas = Cita.objects.filter(fecha_hora=fecha_hora, estado='programada').exists()
-        citas_completadas = Cita.objects.filter(fecha_hora=fecha_hora, estado='completada').exists()
-        citas_canceladas = Cita.objects.filter(fecha_hora=fecha_hora, estado='cancelada').exists()
-
-        # La fecha estará disponible si no hay citas programadas activas
-        fecha_hora.disponible = not (citas_programadas or citas_completadas or citas_canceladas)
-        fecha_hora.save()
+    

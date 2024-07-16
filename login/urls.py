@@ -28,6 +28,8 @@ urlpatterns = [
     path('editar-fechas/<int:id>', views.editarfechas, name="editarfechas"),
     path('list-fechas/', views.listfechas, name="listfechas"),
     path('eliminarfechas/<int:id>/', views.eliminarfechas, name="eliminarfechas"),
+    path('horas-disponibles/', views.get_horas_disponibles, name='horas_disponibles'),
+
     
     path('crear-historias/', views.crearhistorias, name="crearhistorias"),
     path('ver-historias/<int:id>', views.verhistorias, name="verhistorias"),

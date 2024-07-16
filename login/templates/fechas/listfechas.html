@@ -21,6 +21,7 @@
                         <th scope="col">Id</th>
                         <th scope="col">Fecha</th>
                         <th scope="col">Hora</th>
+                        <th scope="col">Disponibilidad</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
@@ -30,6 +31,7 @@
                         <td>{{ disponibilidad.id }}</td>
                         <td>{{ disponibilidad.fecha }}</td>
                         <td>{{ disponibilidad.hora }}</td>
+                        <td>{{ disponibilidad.disponible }}</td>
                         <td>
                             <a href="{% url 'editarfechas' disponibilidad.id %}" class="btn btn-warning" role="button">Editar</a>
                             |

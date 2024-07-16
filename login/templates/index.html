@@ -23,16 +23,18 @@
   <div class="content">
     <div id="message-container" style="display: none;">
       {% if messages %}
-        {% for message in messages %}
-          <div class="message" data-type="{{ message.tags }}" data-content="{{ message }}"></div>
-        {% endfor %}
+      {% for message in messages %}
+      <div class="message" data-type="{{ message.tags }}" data-content="{{ message }}"></div>
+      {% endfor %}
       {% endif %}
     </div>
 
     <div class="header2">
       <div class="headersup">
         <div class="returnhome">
-        <a href="{% url 'dashboard' %}"><p id="home">Home / <b>Dashboard</b></p></a>
+          <a href="{% url 'dashboard' %}">
+            <p id="home">Home / <b>Dashboard</b></p>
+          </a>
         </div>
 
         <nav class="navbar">
@@ -70,9 +72,9 @@
             <div onclick="toggle()" class="profile-dropdown-btn">
               <div class="profile-img">
                 {% if user.imagen %}
-                    <img src="{{ user.imagen.url }}" alt="Profile Image" id="profileImage">
+                <img src="{{ user.imagen.url }}" alt="Profile Image">
                 {% else %}
-                    <i class="fas fa-user"></i>
+                <img src="{% static 'img/user.png' %}" alt="Default Profile Image">
                 {% endif %}
               </div>
 
