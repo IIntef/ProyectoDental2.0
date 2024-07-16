@@ -134,10 +134,11 @@ class Fecha(models.Model):
 
     def __str__(self):
         return f"{self.fecha} {self.hora}"
+    
 
     def save(self, *args, **kwargs):
         now = timezone.now()
-        fecha_hora = timezone.make_aware(timezone.datetime.combine(self.fecha, self.hora))
+        fecha_hora = timezone.datetime.combine(self.fecha, self.hora)
         
         if self.fecha < now.date():
             self.disponible = False
@@ -157,7 +158,7 @@ class Fecha(models.Model):
             models.Q(fecha__gt=now.date()) | 
             models.Q(fecha=now.date(), hora__gt=now.time())
         ).update(disponible=True)
-
+        
 class Cita(models.Model):
     ESTADO_CHOICES = (
         ('programada', 'Programada'),
@@ -175,28 +176,39 @@ class Cita(models.Model):
     motivo = models.CharField(max_length=20, choices=MOTIVO_CHOICES, default='protesis')
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='programada')
     asistio = models.BooleanField(default=False)
-
+    
     def cancelar_cita(self):
         if self.estado == 'programada':
             self.estado = 'cancelada'
-            self.fecha_hora.disponible = True  # Marcar la fecha y hora como disponible
-            self.fecha_hora.save()  # Guardar los cambios en la fecha_hora
-            self.save()  # Guardar los cambios en la cita
+            self.fecha_hora.disponible = False
+            self.fecha_hora.save()
+            self.save()
+        return False
 
     def confirmar_actualizacion(self):
         if self.estado == 'programada':
             self.estado = 'completada'
             self.asistio = True
-            self.fecha_hora.disponible = False  # Marcar la fecha y hora como no disponible
-            self.fecha_hora.save()  # Guardar los cambios en la fecha_hora
-            self.save()  # Guardar los cambios en la cita
+            self.fecha_hora.disponible = False
+            self.fecha_hora.save()
+            self.save()
+        return False
+
+    def save(self, *args, **kwargs):
+        if self.pk:  # Si la cita ya existe en la base de datos
+            cita_anterior = Cita.objects.get(pk=self.pk)
+            if cita_anterior.estado != self.estado:
+                # El estado ha cambiado, actualizar la disponibilidad de la fecha
+                if self.estado in ['programada', 'completada', 'cancelada']:
+                    self.fecha_hora.disponible = False
+                else:
+                    self.fecha_hora.disponible = True
+                self.fecha_hora.save()
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Cita de {self.paciente} el {self.fecha_hora}"
-
-    def save(self, *args, **kwargs):
-        if self.asistio:
-            self.estado = 'completada'
-        super().save(*args, **kwargs)
+    
 
     

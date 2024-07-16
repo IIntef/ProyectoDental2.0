@@ -15,8 +15,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST, require_GET
 from .models import UserProfile, Valoracion, Inventario, Fecha, Cita
 from .forms import ValoracionForm, UserForm, InventarioForm, FechaForm, CitaForm
-from django.utils.html import strip_tags
-
 
 def es_superusuario(user):
     return user.is_superuser
@@ -199,16 +197,14 @@ def configuracion(request, id):
 
 @login_required
 def cancelar_cita(request, cita_id):
-    if request.method == 'POST':
-        cita = get_object_or_404(Cita, id=cita_id)
-        cita.cancelar_cita()  # Asumiendo que tienes un método 'cancelar' en tu modelo Cita
-        messages.success(request, 'Cita cancelada exitosamente.')
+    cita = get_object_or_404(Cita, pk=cita_id)
+    if cita.cancelar_cita():
         return JsonResponse({'success': True})
     else:
-        return JsonResponse({'error': 'Método no permitido'}, status=405)
+        return JsonResponse({'error': 'No se pudo cancelar la cita'}, status=400)
 
 
-@login_required
+@login_required()
 def crearcitas(request):
     try:
         user_profile = UserProfile.objects.get(numero=request.user.numero)
@@ -231,19 +227,7 @@ def crearcitas(request):
                 cita.paciente = user_profile
             
             cita.save()
-
-            # Envío de correo electrónico de recordatorio
-            subject = 'Recordatorio: Creación de Cita'
-            message = render_to_string('citas/email_recordatorio.html', {
-                'cita': cita,
-            })
-            plain_message = strip_tags(message)  # strip_tags para el contenido de texto sin formato
-            from_email = 'tu_correo@example.com'  # Puedes personalizar esto
-            to_email = cita.paciente.user.email  # Debes asegurarte de que el paciente tenga un campo 'user' con el correo electrónico
-
-            send_mail(subject, plain_message, from_email, [to_email], html_message=message)
-
-            messages.success(request, 'Cita creada exitosamente y se ha enviado un recordatorio por correo electrónico.')
+            messages.success(request, 'Cita creada exitosamente.')
             return redirect('listcitas')
         else:
             messages.error(request, 'Hubo un problema al crear la cita.')
@@ -262,8 +246,10 @@ def crearcitas(request):
 @require_POST
 def confirmar_actualizacion_cita(request, cita_id):
     cita = get_object_or_404(Cita, pk=cita_id)
-    cita.confirmar_actualizacion()
-    return JsonResponse({'message': 'Cita actualizada correctamente'}, status=200)
+    if cita.confirmar_actualizacion():
+        return JsonResponse({'message': 'Cita actualizada correctamente'}, status=200)
+    else:
+        return JsonResponse({'error': 'No se pudo confirmar la actualización'}, status=400)
 
 @login_required
 @require_GET
