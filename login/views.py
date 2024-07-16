@@ -285,23 +285,37 @@ def listcitas(request):
         citas = Cita.objects.filter(paciente=request.user)
     return render(request, 'citas/listcitas.html', {'citas': citas})
 
-@login_required
-def editarcitas(request, id):
-    cita = get_object_or_404(Cita, id=id)
-    
+@login_required()
+def editarcitas(request, cita_id):
+    cita = get_object_or_404(Cita, id=cita_id)
+
     if request.method == 'POST':
-        form = CitaForm(request.POST, instance=cita)
+        form = CitaForm(request.POST, instance=cita, user=request.user)
         if form.is_valid():
-            form.save()
-            return redirect('listcitas')
+            paciente = form.cleaned_data.get('paciente')
+            if paciente:
+                try:
+                    # Verifica si el usuario existe antes de guardar la cita
+                    usuario_id = paciente.id
+                    UserProfile.objects.get(id=usuario_id)  # Esto lanzará una excepción si no existe
+                    form.save()
+                    messages.success(request, 'Cita actualizada exitosamente.')
+                    return redirect('listcitas')
+                except UserProfile.DoesNotExist:
+                    messages.error(request, 'El paciente seleccionado no existe.')
+            else:
+                messages.error(request, 'Debe seleccionar un paciente.')
+        else:
+            messages.error(request, 'Hubo un problema al actualizar la cita.')
+            print("Errores en formulario:", form.errors)
     else:
-        form = CitaForm(instance=cita, user=request.user)  # Pasa request.user al inicializar el formulario
-    
-    context = {
+        form = CitaForm(instance=cita, user=request.user)  # Pasar la instancia de cita y el usuario
+
+    contexto = {
         'form': form,
         'cita': cita,
     }
-    return render(request, 'citas/editarcitas.html', context)
+    return render(request, 'citas/editarcitas.html', contexto)
 
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
@@ -375,8 +389,12 @@ def crearfechas(request):
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
 def listfechas(request):
-    disponibilidades= Fecha.objects.all()
-    return render(request, 'fechas/listfechas.html', {'disponibilidades': disponibilidades})
+    disponibilidades = Fecha.objects.filter(disponible=True)
+    
+    context = {
+        'disponibilidades': disponibilidades
+    }
+    return render(request, 'fechas/listfechas.html', context)
 
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()

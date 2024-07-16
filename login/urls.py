@@ -14,7 +14,7 @@ urlpatterns = [
     path('acceso-denegado/', views.acceso_denegado, name='acceso_denegado'),
     
     path('crear-citas/', views.crearcitas, name="crearcitas"),
-    path('editar-citas/<int:id>', views.editarcitas, name="editarcitas"),
+    path('editar-citas/<int:cita_id>', views.editarcitas, name="editarcitas"),
     path('list-citas/', views.listcitas, name="listcitas"),
     path('cancelar-cita/<int:cita_id>/', views.cancelar_cita, name='cancelar_cita'),
     path('confirmar-actualizacion/<int:cita_id>/', views.confirmar_actualizacion_cita, name='confirmar_actualizacion_cita'),

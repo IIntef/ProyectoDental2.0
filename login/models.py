@@ -173,6 +173,7 @@ class Cita(models.Model):
     def confirmar_actualizacion(self):
         if self.estado == 'programada':
             self.estado = 'completada'
+            self.asistio = True
             self.fecha_hora.disponible = False  # Marcar la fecha y hora como no disponible
             self.fecha_hora.save()  # Guardar los cambios en la fecha_hora
             self.save()  # Guardar los cambios en la cita

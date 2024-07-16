@@ -38,6 +38,7 @@
                         <td>{{ cita.get_estado_display }}</td>
                         <td>
                             {% if cita.estado == 'programada' %}
+                            
                             <a href="{% url 'editarcitas' cita.id %}" class="btn btn-warning">Reagendar Cita</a>
                             <button class="btn btn-danger cancelar-cita-btn" data-cita-id="{{ cita.id }}">Cancelar
                                 Cita</button>

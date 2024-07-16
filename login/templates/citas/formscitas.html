@@ -33,11 +33,14 @@
     <div class="mb-3">
       <label for="paciente" class="form-label">Seleccionar Paciente</label>
       <select class="form-select" name="paciente" id="paciente" required>
-        {% for value, display_name in form.fields.paciente.choices %}
-        <option value="{{ value }}">{{ display_name }}</option>
+        {% for value, display_username in form.fields.paciente.choices %}
+        <option value="{{ value }}">{{ display_username }}</option>
         {% endfor %}
       </select>
     </div>
+    {% else %}
+    <input type="hidden" name="paciente" value="{{ cita.paciente.id }}">
+    <p>Seleccionado: {{ cita.paciente.get_username }}</p>
     {% endif %}
 
   </div>
