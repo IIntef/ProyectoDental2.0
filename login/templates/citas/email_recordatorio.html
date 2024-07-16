@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recordatorio: Creación de Cita</title>
+</head>
+<body>
+    <p>Hola {{ cita.paciente.get_full_name }},</p>
+
+    <p>Te informamos que se ha creado una nueva cita para ti:</p>
+    <ul>
+        <li>Fecha: {{ cita.fecha }}</li>
+        <li>Hora: {{ cita.hora }}</li>
+        <li>Motivo: {{ cita.get_motivo_display }}</li>
+        <!-- Puedes agregar más detalles de la cita según tu modelo -->
+    </ul>
+
+    <p>Por favor, contáctanos si necesitas hacer algún ajuste a esta cita.</p>
+
+    <p>Saludos,<br>El equipo de citas</p>
+</body>
+</html>

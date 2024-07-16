@@ -24,7 +24,11 @@
                         <th scope="col">Hora</th>
                         <th scope="col">Motivo</th>
                         <th scope="col">Estado</th>
-                        <th scope="col">Acciones</th>
+                        <th scope="col">Reagendar</th>
+                        <th scope="col">Cancelar</th>
+                        {% if user.is_superuser %}
+                        <th scope="col">Actualizar</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -36,17 +40,20 @@
                         <td>{{ cita.fecha_hora.hora|time:"H:i" }}</td>
                         <td>{{ cita.get_motivo_display }}</td>
                         <td>{{ cita.get_estado_display }}</td>
+                        {% if cita.estado == 'programada' %}
                         <td>
-                            {% if cita.estado == 'programada' %}
-                            
                             <a href="{% url 'editarcitas' cita.id %}" class="btn btn-warning">Reagendar Cita</a>
+                        </td>
+                        <td>
                             <button class="btn btn-danger cancelar-cita-btn" data-cita-id="{{ cita.id }}">Cancelar
                                 Cita</button>
+                        </td>
+                        <td>
                             {% if user.is_superuser %}
                             <button class="btn btn-info confirmar-actualizacion-btn" data-cita-id="{{ cita.id }}">Actualizar Asistencia</button>
                             {% endif %}
-                            {% endif %}
                         </td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>

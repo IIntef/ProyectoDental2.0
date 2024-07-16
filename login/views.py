@@ -1,9 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.db import IntegrityError
-from .models import UserProfile, Valoracion, Inventario, Fecha, Cita
-from django.contrib.auth.decorators import login_required
-from .forms import ValoracionForm, UserForm, InventarioForm, FechaForm, CitaForm
 from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -14,13 +11,13 @@ from django.template.loader import render_to_string
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
-from django.contrib.auth.decorators import user_passes_test
-from django.shortcuts import get_object_or_404, HttpResponse
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import user_passes_test
-from .models import Cita
-from django.views.decorators.http import require_GET, require_POST
- 
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.decorators.http import require_POST, require_GET
+from .models import UserProfile, Valoracion, Inventario, Fecha, Cita
+from .forms import ValoracionForm, UserForm, InventarioForm, FechaForm, CitaForm
+from django.utils.html import strip_tags
+
+
 def es_superusuario(user):
     return user.is_superuser
 
@@ -38,7 +35,7 @@ def cambiar_password(request):
             return redirect('dashboard')  # O la página que prefieras
     else:
         form = PasswordChangeForm(request.user)
-    return render(request, 'cambiar_password.html', {
+    return render(request, 'cuentas/cambiar_password.html', {
         'form': form
     })
 
@@ -198,7 +195,7 @@ def configuracion(request, id):
             return redirect('dashboard') 
     else:
         form = UserForm(instance=perfil_usuario)
-    return render(request, 'configuracion.html', {'form': form})
+    return render(request, 'cuentas/configuracion.html', {'form': form})
 
 @login_required
 def cancelar_cita(request, cita_id):
@@ -211,7 +208,7 @@ def cancelar_cita(request, cita_id):
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
-@login_required()
+@login_required
 def crearcitas(request):
     try:
         user_profile = UserProfile.objects.get(numero=request.user.numero)
@@ -234,7 +231,19 @@ def crearcitas(request):
                 cita.paciente = user_profile
             
             cita.save()
-            messages.success(request, 'Cita creada exitosamente.')
+
+            # Envío de correo electrónico de recordatorio
+            subject = 'Recordatorio: Creación de Cita'
+            message = render_to_string('citas/email_recordatorio.html', {
+                'cita': cita,
+            })
+            plain_message = strip_tags(message)  # strip_tags para el contenido de texto sin formato
+            from_email = 'tu_correo@example.com'  # Puedes personalizar esto
+            to_email = cita.paciente.user.email  # Debes asegurarte de que el paciente tenga un campo 'user' con el correo electrónico
+
+            send_mail(subject, plain_message, from_email, [to_email], html_message=message)
+
+            messages.success(request, 'Cita creada exitosamente y se ha enviado un recordatorio por correo electrónico.')
             return redirect('listcitas')
         else:
             messages.error(request, 'Hubo un problema al crear la cita.')
