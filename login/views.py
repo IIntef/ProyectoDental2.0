@@ -196,12 +196,19 @@ def configuracion(request, id):
     return render(request, 'cuentas/configuracion.html', {'form': form})
 
 @login_required
+@require_POST
 def cancelar_cita(request, cita_id):
-    cita = get_object_or_404(Cita, pk=cita_id)
-    if cita.cancelar_cita():
-        return JsonResponse({'success': True})
-    else:
-        return JsonResponse({'error': 'No se pudo cancelar la cita'}, status=400)
+    try:
+        cita = Cita.objects.get(id=cita_id)
+        resultado = cita.cancelar_cita()
+        if resultado:
+            return JsonResponse({'status': 'success'}, status=200)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'No se pudo cancelar la cita'}, status=400)
+    except Cita.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Cita no encontrada'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
 @login_required()
@@ -245,11 +252,22 @@ def crearcitas(request):
 @login_required
 @require_POST
 def confirmar_actualizacion_cita(request, cita_id):
-    cita = get_object_or_404(Cita, pk=cita_id)
-    if cita.confirmar_actualizacion():
-        return JsonResponse({'message': 'Cita actualizada correctamente'}, status=200)
-    else:
-        return JsonResponse({'error': 'No se pudo confirmar la actualización'}, status=400)
+    try:
+        cita = Cita.objects.get(id=cita_id)
+        resultado = cita.confirmar_actualizacion()
+        if resultado:
+            return JsonResponse({'status': 'success'}, status=200)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'No se pudo actualizar la cita'}, status=400)
+    except Cita.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Cita no encontrada'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@login_required
+def obtener_fechas_horas_disponibles(request):
+    fechas_horas = Fecha.objects.filter(disponible=True).values('fecha', 'hora')
+    return JsonResponse(list(fechas_horas), safe=False)
 
 @login_required
 @require_GET

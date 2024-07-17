@@ -19,6 +19,8 @@ urlpatterns = [
     path('cancelar-cita/<int:cita_id>/', views.cancelar_cita, name='cancelar_cita'),
     path('confirmar-actualizacion/<int:cita_id>/', views.confirmar_actualizacion_cita, name='confirmar_actualizacion_cita'),
     path('get-horas-disponibles/', views.get_horas_disponibles, name='get_horas_disponibles'),
+    path('obtener-fechas-horas-disponibles/', views.obtener_fechas_horas_disponibles, name='obtener_fechas_horas_disponibles'),
+
     
     path('crear-cuentas/', views.crearcuentas, name="crearcuentas"),
     path('editar-cuentas/<int:id>', views.editarcuentas, name="editarcuentas"),

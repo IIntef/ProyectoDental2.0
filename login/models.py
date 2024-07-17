@@ -183,7 +183,7 @@ class Cita(models.Model):
             self.fecha_hora.disponible = False
             self.fecha_hora.save()
             self.save()
-        return False
+            return True
 
     def confirmar_actualizacion(self):
         if self.estado == 'programada':
@@ -192,23 +192,37 @@ class Cita(models.Model):
             self.fecha_hora.disponible = False
             self.fecha_hora.save()
             self.save()
-        return False
+            return True
 
     def save(self, *args, **kwargs):
-        if self.pk:  # Si la cita ya existe en la base de datos
-            cita_anterior = Cita.objects.get(pk=self.pk)
-            if cita_anterior.estado != self.estado:
-                # El estado ha cambiado, actualizar la disponibilidad de la fecha
-                if self.estado in ['programada', 'completada', 'cancelada']:
-                    self.fecha_hora.disponible = False
-                else:
-                    self.fecha_hora.disponible = True
-                self.fecha_hora.save()
-
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Cita de {self.paciente} el {self.fecha_hora}"
     
-
+@receiver(post_save, sender=Cita)
+@receiver(post_delete, sender=Cita)
+def actualizar_disponibilidad_fecha(sender, instance, created, **kwargs):
+    fecha_hora = instance.fecha_hora
+    now = timezone.now()
     
+    # Si es una nueva cita o la cita existe y no está cancelada
+    if created or (not created and instance.estado != 'cancelada'):
+        fecha_hora.disponible = False
+    else:
+        # Verificar si hay otras citas activas para esta fecha_hora
+        citas_activas = Cita.objects.filter(
+            fecha_hora=fecha_hora, 
+            estado__in=['programada', 'completada']
+        ).exclude(pk=instance.pk).exists()
+        
+        fecha_hora.disponible = not citas_activas
+
+    fecha_hora.save()
+
+
+@receiver(post_save, sender=Fecha)
+def actualizar_todas_fechas(sender, **kwargs):
+    now = timezone.now()
+    Fecha.objects.filter(fecha__lt=now.date()).update(disponible=False)
+    Fecha.objects.filter(fecha=now.date(), hora__lt=now.time()).update(disponible=False)
