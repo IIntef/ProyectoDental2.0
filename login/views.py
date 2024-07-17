@@ -15,6 +15,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST, require_GET
 from .models import UserProfile, Valoracion, Inventario, Fecha, Cita
 from .forms import ValoracionForm, UserForm, InventarioForm, FechaForm, CitaForm
+from django.utils import timezone
+
 
 def es_superusuario(user):
     return user.is_superuser
@@ -271,11 +273,6 @@ def confirmar_actualizacion_cita(request, cita_id):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 @login_required
-def obtener_fechas_horas_disponibles(request):
-    fechas_horas = Fecha.objects.filter(disponible=True).values('fecha', 'hora')
-    return JsonResponse(list(fechas_horas), safe=False)
-
-@login_required
 @require_GET
 def get_horas_disponibles(request):
     fecha = request.GET.get('fecha')
@@ -307,28 +304,51 @@ def listcitas(request):
 @login_required()
 def editarcitas(request, cita_id):
     cita = get_object_or_404(Cita, id=cita_id)
+    fecha_hora_original = cita.fecha_hora
 
     if request.method == 'POST':
         form = CitaForm(request.POST, instance=cita, user=request.user)
         if form.is_valid():
-            paciente = form.cleaned_data.get('paciente')
-            if paciente:
-                try:
-                    # Verifica si el usuario existe antes de guardar la cita
-                    usuario_id = paciente.id
-                    UserProfile.objects.get(id=usuario_id)  # Esto lanzará una excepción si no existe
-                    form.save()
-                    messages.success(request, 'Cita actualizada exitosamente.')
-                    return redirect('listcitas')
-                except UserProfile.DoesNotExist:
-                    messages.error(request, 'El paciente seleccionado no existe.')
-            else:
-                messages.error(request, 'Debe seleccionar un paciente.')
+            nueva_cita = form.save(commit=False)
+            nueva_fecha = form.cleaned_data['fecha']
+            nueva_hora = form.cleaned_data['hora']
+            
+            # Obtener o crear el objeto Fecha para la nueva fecha y hora
+            nueva_fecha_hora, created = Fecha.objects.get_or_create(fecha=nueva_fecha, hora=nueva_hora)
+            
+            if nueva_fecha_hora != fecha_hora_original:
+                print(f"Editando cita de {fecha_hora_original} a {nueva_fecha_hora}")
+                
+                # Liberar la fecha original
+                citas_en_fecha_original = Cita.objects.filter(
+                    fecha_hora=fecha_hora_original, 
+                    estado__in=['programada', 'completada']
+                ).exclude(id=cita_id)
+                if not citas_en_fecha_original.exists():
+                    fecha_hora_original.disponible = True
+                    fecha_hora_original.save()
+                    print(f"Fecha original {fecha_hora_original} marcada como disponible")
+                
+                # Ocupar la nueva fecha
+                nueva_fecha_hora.disponible = False
+                nueva_fecha_hora.save()
+                print(f"Nueva fecha {nueva_fecha_hora} marcada como no disponible")
+                
+                nueva_cita.fecha_hora = nueva_fecha_hora
+            
+            nueva_cita.save()
+            messages.success(request, 'Cita actualizada exitosamente.')
+            return redirect('listcitas')
         else:
-            messages.error(request, 'Hubo un problema al actualizar la cita.')
-            print("Errores en formulario:", form.errors)
+            print(form.errors)
     else:
-        form = CitaForm(instance=cita, user=request.user)  # Pasar la instancia de cita y el usuario
+        initial_data = {
+            'fecha': cita.fecha_hora.fecha,
+            'hora': cita.fecha_hora.hora,
+            'motivo': cita.motivo,
+            'paciente': cita.paciente
+        }
+        form = CitaForm(instance=cita, user=request.user, initial=initial_data)
 
     contexto = {
         'form': form,
@@ -408,7 +428,14 @@ def crearfechas(request):
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required()
 def listfechas(request):
-    disponibilidades = Fecha.objects.filter(disponible=True)
+    # Obtener la fecha actual
+    fecha_actual = timezone.now().date()
+    
+    # Obtener solo las fechas futuras que están marcadas como disponibles
+    disponibilidades = Fecha.objects.filter(
+        fecha__gte=fecha_actual,
+        disponible=True
+    ).order_by('fecha', 'hora')
     
     context = {
         'disponibilidades': disponibilidades

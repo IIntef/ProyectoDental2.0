@@ -56,6 +56,7 @@ class FechaForm(forms.ModelForm):
 
 
 class CitaForm(forms.ModelForm):
+    
     fecha = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     hora = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}))
     motivo = forms.ChoiceField(choices=Cita.MOTIVO_CHOICES)

@@ -140,36 +140,6 @@ class Fecha(models.Model):
         super().save(*args, **kwargs)
         print(f"Fecha guardada. Disponible después de guardar: {self.disponible}")
 
-    @classmethod
-    def actualizar_todas_fechas(cls):
-        now = timezone.now()
-        print(f"Actualizando todas las fechas. Hora actual: {now}")
-        
-        # Marcar como no disponibles las fechas pasadas
-        pasadas = cls.objects.filter(
-            models.Q(fecha__lt=now.date()) | 
-            models.Q(fecha=now.date(), hora__lte=now.time())
-        )
-        pasadas_count = pasadas.update(disponible=False)
-        
-        # Marcar como disponibles las fechas futuras
-        futuras = cls.objects.filter(
-            models.Q(fecha__gt=now.date()) | 
-            models.Q(fecha=now.date(), hora__gt=now.time())
-        )
-        futuras_count = futuras.update(disponible=True)
-        
-        print(f"Fechas pasadas marcadas como no disponibles: {pasadas_count}")
-        print(f"Fechas futuras marcadas como disponibles: {futuras_count}")
-
-    @classmethod
-    def obtener_fechas_disponibles(cls):
-        now = timezone.now()
-        return cls.objects.filter(
-            models.Q(fecha__gt=now.date()) | 
-            models.Q(fecha=now.date(), hora__gt=now.time()),
-            disponible=True
-        )
 
 class Cita(models.Model):
     ESTADO_CHOICES = (
@@ -196,14 +166,15 @@ class Cita(models.Model):
 
     def actualizar_disponibilidad(self, is_new):
         print(f"Actualizando disponibilidad para fecha_hora: {self.fecha_hora}")
-        if is_new or self.estado != 'cancelada':
+        if is_new or self.estado == 'programada':
             self.fecha_hora.disponible = False
-        else:
+        elif self.estado == 'cancelada':
             citas_activas = Cita.objects.filter(
                 fecha_hora=self.fecha_hora, 
                 estado__in=['programada', 'completada']
             ).exclude(pk=self.pk).exists()
-            self.fecha_hora.disponible = not citas_activas
+            if not citas_activas:
+                self.fecha_hora.disponible = True
         
         print(f"Guardando fecha_hora con disponibilidad: {self.fecha_hora.disponible}")
         self.fecha_hora.save()
@@ -212,17 +183,6 @@ class Cita(models.Model):
         if self.estado == 'programada':
             self.estado = 'cancelada'
             self.save()
-            
-            # Verificar si hay otras citas activas para esta fecha_hora
-            citas_activas = Cita.objects.filter(
-                fecha_hora=self.fecha_hora, 
-                estado__in=['programada', 'completada']
-            ).exclude(pk=self.pk).exists()
-            
-            if not citas_activas:
-                self.fecha_hora.disponible = True
-                self.fecha_hora.save()
-            
             print(f"Cita cancelada. Nueva disponibilidad de fecha_hora: {self.fecha_hora.disponible}")
             return True
         return False
