@@ -1,25 +1,26 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate, logout
-from django.db import IntegrityError
-from django.core.mail import send_mail, EmailMessage
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from django.urls import reverse
-from django.http import HttpResponse, JsonResponse
-from django.template.loader import render_to_string
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
+from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.views.decorators.http import require_POST, require_GET
-from .models import UserProfile, Valoracion, Inventario, Fecha, Cita
-from .forms import ValoracionForm, UserForm, InventarioForm, FechaForm, CitaForm
-from django.utils import timezone
-from django.views.generic import TemplateView
-from django.views.decorators.cache import never_cache
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import update_session_auth_hash
+from django.core.mail import send_mail, EmailMessage
+from django.db import IntegrityError
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils import timezone
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_POST, require_GET
+from django.views.generic import TemplateView
 
+from .forms import ValoracionForm, UserForm, InventarioForm, FechaForm, CitaForm
+from .models import UserProfile, Valoracion, Inventario, Fecha, Cita
 
 @method_decorator(never_cache, name='dispatch')
 class dashView(TemplateView):
@@ -253,6 +254,20 @@ def crearcitas(request):
                 cita.paciente = user_profile
             cita.estado = 'programada'
             cita.save()
+            
+            # Enviar correo de recordatorio
+            subject = 'Recordatorio de Cita Programada'
+            message = f'Hola {cita.paciente.username},\n\nTu cita ha sido programada para el {cita.fecha_hora.fecha} a las {cita.fecha_hora.hora}.\n\nSaludos,\nTu Equipo de Citas \n Laboratorio Dental - Sandra Gavíria'
+            recipient_list = [cita.paciente.email]
+
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                recipient_list,
+                fail_silently=False,
+            )
+            
             cita_db = Cita.objects.get(pk=cita.pk)
             fecha_hora_db = Fecha.objects.get(pk=cita.fecha_hora.pk)
             print(f"Estado de la cita después de guardar: {cita_db.estado}")
