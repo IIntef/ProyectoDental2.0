@@ -16,6 +16,23 @@ from django.views.decorators.http import require_POST, require_GET
 from .models import UserProfile, Valoracion, Inventario, Fecha, Cita
 from .forms import ValoracionForm, UserForm, InventarioForm, FechaForm, CitaForm
 from django.utils import timezone
+from django.views.generic import TemplateView
+from django.views.decorators.cache import never_cache
+from django.utils.decorators import method_decorator
+
+
+@method_decorator(never_cache, name='dispatch')
+class dashView(TemplateView):
+    template_name = 'dashboard.html'
+    
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Administración'
+        return context
 
 
 def es_superusuario(user):
@@ -24,6 +41,7 @@ def es_superusuario(user):
 def acceso_denegado(request):
     return render(request, 'acceso_denegado.html')
 
+@method_decorator(never_cache, name='dispatch')
 @login_required
 def cambiar_password(request):
     if request.method == 'POST':
@@ -178,12 +196,9 @@ def signout(request):
     logout(request)
     return redirect('loginregister')
 
-@login_required()
+@login_required(login_url='loginregister')
 def dashboard(request):
-    if request.user.is_authenticated:
-        return render(request, 'dashboard.html', {'user': request.user})
-    else:
-        return redirect('loginregister')
+    return render(request, 'dashboard.html', {'user': request.user})
 
 @login_required()
 def configuracion(request, id):

@@ -2,11 +2,12 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 
+
 urlpatterns = [
     path('', views.inicio, name='inicio'),
     path('base/', views.base, name="base"),
     path('loginregister/', views.registrarme, name="loginregister"),
-    path('dashboard/', views.dashboard, name="dashboard"),
+    path('dashboard/', views.dashView.as_view(), name="dashboard"),
     path('signout/', views.signout, name="signout"),
     path('configuracion/<int:id>/', views.configuracion, name="configuracion"),
     path('correo/', views.correo, name="correo"),
