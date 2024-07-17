@@ -202,12 +202,14 @@ def cancelar_cita(request, cita_id):
         cita = Cita.objects.get(id=cita_id)
         resultado = cita.cancelar_cita()
         if resultado:
+            print(f"Cita {cita_id} cancelada. Nueva disponibilidad: {cita.fecha_hora.disponible}")
             return JsonResponse({'status': 'success'}, status=200)
         else:
             return JsonResponse({'status': 'error', 'message': 'No se pudo cancelar la cita'}, status=400)
     except Cita.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Cita no encontrada'}, status=404)
     except Exception as e:
+        print(f"Error al cancelar cita: {str(e)}")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
@@ -232,8 +234,12 @@ def crearcitas(request):
 
             if not request.user.is_superuser:
                 cita.paciente = user_profile
-            
+            cita.estado = 'programada'
             cita.save()
+            cita_db = Cita.objects.get(pk=cita.pk)
+            fecha_hora_db = Fecha.objects.get(pk=cita.fecha_hora.pk)
+            print(f"Estado de la cita después de guardar: {cita_db.estado}")
+            print(f"Disponibilidad de fecha_hora después de guardar cita: {fecha_hora_db.disponible}")
             messages.success(request, 'Cita creada exitosamente.')
             return redirect('listcitas')
         else:
