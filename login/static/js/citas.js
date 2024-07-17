@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 alert('Cita cancelada exitosamente.');
                 window.location.reload();
-                actualizarInterfaz();
             })
             .catch(error => {
                 console.error('Error en la solicitud:', error);
@@ -52,39 +51,12 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 alert('Cita actualizada correctamente.');
                 window.location.reload();
-                actualizarInterfaz();
             })
             .catch(error => {
                 console.error('Error en la solicitud:', error);
                 alert(error.message);
             });
         }
-    }
-
-    function actualizarInterfaz() {
-        // Actualizar la lista de citas
-        actualizarListaCitas();
-        // Actualizar las fechas y horas disponibles
-        const fechaInput = document.getElementById('fecha');
-        if (fechaInput && fechaInput.value) {
-            cargarHorasDisponibles(fechaInput.value);
-        }
-    }
-
-    function actualizarListaCitas() {
-        fetch('/obtener-lista-citas/')
-            .then(response => response.text())
-            .then(html => {
-                const listaCitasContainer = document.getElementById('lista-citas-container');
-                if (listaCitasContainer) {
-                    listaCitasContainer.innerHTML = html;
-                    // Volver a agregar los event listeners a los nuevos botones
-                    agregarEventListenersBotones();
-                }
-            })
-            .catch(error => {
-                console.error('Error al actualizar la lista de citas:', error);
-            });
     }
 
     const cancelButtons = document.querySelectorAll('.cancelar-cita-btn');

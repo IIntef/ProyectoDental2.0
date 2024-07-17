@@ -40,20 +40,19 @@
                         <td>{{ cita.fecha_hora.hora|time:"H:i" }}</td>
                         <td>{{ cita.get_motivo_display }}</td>
                         <td>{{ cita.get_estado_display }}</td>
-                        {% if cita.estado == 'programada' %}
                         <td>
-                            <a href="{% url 'editarcitas' cita.id %}" class="btn btn-warning">Reagendar Cita</a>
+                            <a {% if cita.estado == 'programada' %}href="{% url 'editarcitas' cita.id %}" class="btn btn-warning"{% else %}class="btn btn-secondary disabled"{% endif %}>Reagendar Cita</a>
                         </td>
                         <td>
-                            <button class="btn btn-danger cancelar-cita-btn" data-cita-id="{{ cita.id }}">Cancelar
+                            <button {% if cita.estado == 'programada' %}class="btn btn-danger cancelar-cita-btn"{% else %}class="btn btn-secondary disabled"{% endif %} data-cita-id="{{ cita.id }}">Cancelar
                                 Cita</button>
                         </td>
                         <td>
                             {% if user.is_superuser %}
-                            <button class="btn btn-info confirmar-actualizacion-btn" data-cita-id="{{ cita.id }}">Actualizar Asistencia</button>
+                            <button {% if cita.estado == 'programada' %}class="btn btn-info confirmar-actualizacion-btn"{% else %}class="btn btn-secondary disabled"{% endif %} data-cita-id="{{ cita.id }}">Actualizar Asistencia</button>
                             {% endif %}
                         </td>
-                        {% endif %}
+                        
                     </tr>
                     {% endfor %}
                 </tbody>
