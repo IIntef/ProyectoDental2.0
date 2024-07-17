@@ -8,7 +8,7 @@
 {% block content %}
 <div class="card">
     <div class="card-body">
-        <h4 class="card-title">Datos Usuario</h4>
+        <h4 class="card-title">Configuración del Usuario</h4>
         <form enctype="multipart/form-data" method="POST">
             {% csrf_token %}
             
@@ -23,6 +23,7 @@
                 
                 {% if field.name == 'tipo' %}
                 <select class="form-select" name="{{ field.name }}" id="{{ field.id_for_label }}">
+                    <option value="" {% if not field.value %}selected{% endif %}>Selecciona una opción</option>
                     {% for value, display_name in field.field.choices %}
                     <option value="{{ value }}" {% if value == field.value %}selected{% endif %}>{{ display_name }}</option>
                     {% endfor %}
@@ -41,7 +42,6 @@
             </div>
             <div class="col-12 help-text">{{ field.errors }}</div>
             {% endfor %}
-            <a class="btn btn-primary" href="{% url 'cambiar_password' %}" role="button">Cambiar Contraseña</a>
             <button type="submit" class="btn btn-success">Guardar</button>
             <a class="btn btn-warning" href="{% url 'dashboard' %}" onclick="event.preventDefault(); history.back();" role="button">Cancelar</a>
         </form>

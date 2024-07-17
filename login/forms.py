@@ -28,6 +28,10 @@ class UserForm(forms.ModelForm):
                 raise forms.ValidationError("No se pudo leer el archivo. Asegúrese de que es una imagen válida.")
         return imagen
 
+    def __init__(self, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
+        self.fields['tipo'].required = False
+
 class ValoracionForm(forms.ModelForm):
     class Meta:
         model = Valoracion

@@ -32,7 +32,7 @@ class dashView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Administración'
+        context['titulo'] = 'DENTAL LAB - S.G'
         return context
 
 
@@ -205,13 +205,18 @@ def dashboard(request):
 def configuracion(request, id):
     perfil_usuario = UserProfile.objects.get(id=id)
     if request.method == 'POST':
+        print("Datos recibidos en POST:", request.POST)
         form = UserForm(request.POST, request.FILES, instance=perfil_usuario)
         if form.is_valid():
             form.save()
-            return redirect('dashboard') 
+            print("Perfil actualizado:", form.cleaned_data)
+            return redirect('dashboard')
+        else:
+            print("Errores en el formulario:", form.errors)
     else:
         form = UserForm(instance=perfil_usuario)
     return render(request, 'cuentas/configuracion.html', {'form': form})
+
 
 @login_required
 @require_POST
