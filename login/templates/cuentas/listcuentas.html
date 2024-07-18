@@ -39,7 +39,7 @@
                             <td>{{ cuenta.numero }}</td>
                             <td>{{ cuenta.username }}</td>
                             <td>{% if cuenta.imagen %}
-                                <img src="{{ cuenta.imagen.url }}" alt="Imagen de cuenta" width="100px"> 
+                                <img src="{{ cuenta.imagen.url }}" alt="Imagen de cuenta" width="100px" height="100px" style="object-fit: cover; object-position: center;"> 
                             {% else %}
                                 <p>No hay imagen disponible</p>
                             {% endif %}</td>
