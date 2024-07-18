@@ -11,7 +11,7 @@
         {% endif %}
         
         {% if field.name == 'tipo' %}
-        <select class="form-select" naame="{{ field.name }}" id="{{ field.id_for_label }}">
+        <select class="form-select" name="{{ field.name }}" id="{{ field.id_for_label }}">
             {% for value, display_name in field.field.choices %}
             <option value="{{ value }}" {% if value == field.value %}selected{% endif %}>{{ display_name }}</option>
             {% endfor %}

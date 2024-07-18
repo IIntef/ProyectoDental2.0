@@ -128,6 +128,7 @@ def fetch_user_details(request):
         user = UserProfile.objects.filter(numero=numero).first()
         if user:
             data = {
+                'tipo': user.tipo,
                 'username': user.username,
                 'email': user.email,
                 'direccion': user.direccion,
@@ -426,14 +427,18 @@ def listcuentas(request):
 @user_passes_test(es_superusuario, login_url='acceso_denegado')
 @login_required
 def editarcuentas(request, id):
-    form_edcuentas = UserProfile.objects.get(id=id)
+    cuenta = get_object_or_404(UserProfile, id=id)
     if request.method == 'POST':
-        form = UserForm(request.POST, request.FILES, instance=form_edcuentas)
+        form = UserForm(request.POST, request.FILES, instance=cuenta)
+        print(f"Datos POST recibidos: {request.POST}")  # Log para debugging
         if form.is_valid():
+            print(f"Datos del formulario: {form.cleaned_data}")  # Log para debugging
             form.save()
-            return redirect('listcuentas') 
+            return redirect('listcuentas')
+        else:
+            print(f"Errores del formulario: {form.errors}")  # Log para debugging
     else:
-        form = UserForm(instance=form_edcuentas)
+        form = UserForm(instance=cuenta)
     return render(request, 'cuentas/editarcuentas.html', {'form': form})
 
 @user_passes_test(es_superusuario, login_url='acceso_denegado')

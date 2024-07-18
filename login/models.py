@@ -44,7 +44,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     )
     
     tipo = models.PositiveSmallIntegerField(choices=TIPO_CHOICES, default=2)
-    numero = models.PositiveIntegerField(unique=True)
+    numero = models.BigIntegerField(unique=True)
     username = models.CharField(max_length=50)
     imagen = models.ImageField(upload_to='imagenes/', blank=True, null=True)
     direccion = models.CharField(max_length=100, null=True, blank=True)

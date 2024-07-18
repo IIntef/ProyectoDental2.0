@@ -1,5 +1,6 @@
 from django import forms
 from .models import UserProfile, Valoracion, Inventario, Fecha, Cita
+from django.core.validators import MaxValueValidator
 from PIL import Image
 
 class UserForm(forms.ModelForm):
@@ -7,7 +8,12 @@ class UserForm(forms.ModelForm):
         model = UserProfile
         fields = ['tipo', 'numero', 'username', 'imagen', 'email', 'direccion', 'edad', 'ocupacion', 'celular', 'acudiente']
 
-    tipo = forms.ChoiceField(choices=UserProfile.TIPO_CHOICES)
+    tipo = forms.TypedChoiceField(
+        choices=UserProfile.TIPO_CHOICES,
+        coerce=int
+    )
+    numero = forms.IntegerField(validators=[MaxValueValidator(9223372036854775807)])
+
 
     def clean_imagen(self):
         imagen = self.cleaned_data.get('imagen')
