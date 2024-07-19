@@ -46,7 +46,7 @@ header {
 }
 
 .header2 {
-  position: sticky;
+  position: relative;
   height: fit-content;
 }
 
@@ -166,20 +166,22 @@ i{
 
 .navbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: right;
   align-items: center;
-  height: 100%;
   width: 100%;
-  top: -35px;
 }
 
 .navbar-list {
-  top: 8px;
+  padding-top: 15px;
   display: flex;
   position: relative;
   padding-right: 0.6rem;
   overflow: hidden;
   width: 0;
+}
+.profile-dropdown {
+  position: relative;
+  width: fit-content;
 }
 
 
