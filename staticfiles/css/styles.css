@@ -1,12 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Fredoka One');
 
-:root {
-  --secondary: #e4cf85;
-  --dorado: #CAB97D;
-  --secondary-light: #383A3F;
-  --secondary-light-2: wheat;
-  --shadow: 0px 2px 8px 0px var(--secondary-light);
-}
 
 *{
   box-sizing: border-box;
@@ -59,7 +52,6 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 8vh; /* Ajusta según necesites */
 }
 
 .headerinf {
@@ -163,11 +155,13 @@ i{
   justify-content: flex-end;
   align-items: center;
   height: 100%;
-  box-shadow: var(--shadow);
   width: 100%;
+  top: -40px;
 }
 
 .navbar-list {
+  top: 12px;
+  display: flex;
   position: relative;
   padding-right: 0.6rem;
   overflow: hidden;
@@ -183,13 +177,15 @@ i{
 .navbar-list li a {
   font-size: 1rem;
   font-weight: 500;
-  color: var(--black);
+  color: var(black);
   text-decoration: none;
 }
 
 .profile-dropdown {
-  position: relative;
-  width: fit-content;
+  position: absolute; /* Posiciona el dropdown relativo al contenedor .headersup */
+  top: 100%; /* Justo debajo del contenedor .headersup, pero dentro de él */
+  right: 0; /* Alineado a la derecha del contenedor .headersup */
+  z-index: 1000; /* Asegura que esté por encima de otros elementos */
 }
 
 .profile-dropdown-btn {
@@ -200,29 +196,21 @@ i{
   font-weight: 500;
   width: 50px;
   border-radius: 50px;
-  /* background-color: white;
-  box-shadow: var(--shadow); */
   cursor: pointer;
-  border: 1px solid var(--secondary);
-  transition: box-shadow 0.2s ease-in, background-color 0.2s ease-in,
-    border 0.3s;
+  border: 1px solid;
 }
 
 .profile-dropdown-btn:hover {
-  background-color: var(--secondary-light-2);
-  box-shadow: var(--shadow);
   width: fit-content;
   color: #232323;
   padding-right: 0.5rem;
   span{
-    display: contents;
+    display: block;
     
   }
 }
 
 .profile-dropdown-btn.show-caption {
-  background-color: var(--secondary-light-2);
-  box-shadow: var(--shadow);
   width: fit-content;
   color: #232323;
   padding-right: 0.5rem;
@@ -232,10 +220,10 @@ i{
 }
 
 .profile-img {
-  width: 8vw;
-  height: 8vw;
-  max-width: 50px;
-  max-height: 50px;
+  width: 7vw;
+  height: 7vw;
+  max-width: 45px;
+  max-height: 45px;
   border-radius: 50%;
   overflow: hidden;
   position: relative;
@@ -247,25 +235,9 @@ i{
   object-fit: cover;
 }
 
-.profile-img .status-icon {
-  position: absolute;
-  right: 0;
-  bottom: 0.3rem;
-  font-size: 0.7rem;
-  color: greenyellow;
-}
-
-.profile-img i {
-  position: absolute;
-  right: 0;
-  bottom: 0.3rem;
-  font-size: 0.7rem;
-  color: greenyellow;
-}
-
 .profile-dropdown-btn span {
   margin: 0;
-  padding: 12px 0;
+  padding: 10px 0;
   text-align: center;
   height: 42px;
   font-family: 'Fredoka One';
@@ -303,13 +275,11 @@ i{
 }
 
 .profile-dropdown-list-item a i {
-  font-size: 0.5rem;
-  width: 1.5rem;
-  height: 1.5rem;
-  background-color: var(--secondary);
+  font-size: 1rem;
+  width: 1.8rem;
+  height: 1.8rem;
   color: white;
-  line-height: 2.3rem;
+  line-height: 1.8rem;
   text-align: center;
   border-radius: 50%;
-  transition: margin-right 0.3s;
-}
+  transition: margin-right 0.3s;}

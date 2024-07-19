@@ -1,10 +1,4 @@
-{% extends 'index.html' %}
-
-{% load static %}
-{% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <link rel="stylesheet" href="{% static 'css/historias.css' %}">    
-{% endblock %}
+{% extends 'base.html' %}
 
 {% block content %}
     <div class="card">
@@ -13,8 +7,25 @@
         </div>
         <div class="card-body">
             <h4 class="card-title">Pacientes Registrados</h4>
+
+            <div class="mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar paciente...">
+            </div>
+            
+            <!-- Filtros -->
+            <div class="mb-3">
+                <select id="tipoDocumentoFilter" class="form-select">
+                    <option value="">Todos los tipos de documento</option>
+                    <option value="C.C">Cédula de Ciudadanía</option>
+                    <option value="T.I">Tarjeta de Identidad</option>
+                    <option value="C.E">Cédula de Extranjería</option>
+                    <option value="C.I">Carnet de Identidad</option>
+                    <!-- Agrega más opciones según tus tipos de documento -->
+                </select>
+            </div>
+
             <div class="table-responsive">
-                <table class="table table-primary">
+                <table id="patientTable" class="table table-primary">
                     <thead>
                         <tr>
                             <th scope="col">Id</th>
@@ -58,8 +69,8 @@
                     </tbody>
                 </table>
             </div>
+            <a class="btn btn-primary" href="{% url 'dashboard' %}" role="button">Volver</a>
         </div>
-        <a class="btn btn-primary" href="{% url 'dashboard' %}" role="button">Volver</a>
     </div>
 
     <!-- Modal de confirmación -->
@@ -74,8 +85,4 @@
             </form>
         </div>
     </div>
-{% endblock %}
-
-{% block extra_js %}
-    <script src="{% static 'js/historias.js' %}"></script>
 {% endblock %}

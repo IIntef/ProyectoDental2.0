@@ -1,12 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Fredoka One');
 
-:root {
-  --secondary: #e4cf85;
-  --dorado: #CAB97D;
-  --secondary-light: #383A3F;
-  --secondary-light-2: wheat;
-  --shadow: 0px 2px 8px 0px var(--secondary-light);
-}
 
 *{
   box-sizing: border-box;
@@ -24,6 +17,9 @@ html, body {
 }
 
 body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Times New Roman', Times, serif, Helvetica, Arial, sans-serif;
   display: flex;
   min-height: 100vh;
   width: 100%;
@@ -31,14 +27,15 @@ body {
 }
 
 header {
-  position: sticky;
+  position: relative;
   background-color: #232323;
-  width: fit-content; /* Ajusta según el ancho que desees */
+  width: fit-content;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  
+  z-index: 1;
 }
 
 .content {
@@ -50,26 +47,35 @@ header {
 
 .header2 {
   position: sticky;
+  height: fit-content;
 }
 
 .headersup {
+  display: flex;
   background-color: #383A3F;
   color: white;
-  padding: 15px;
-  display: flex;
   justify-content: space-between;
+  padding: 15px;
+  position: relative;
+  width: 100%;
+  height: 9vw;
+  max-height: 8vh;
+  flex-direction: row;
   align-items: center;
-  height: 8vh; /* Ajusta según necesites */
 }
 
 .headerinf {
+  display: flex;
   background-color: #272727;
   color: white;
-  padding: 10px 15px;
-  height: 6vh; /* Ajusta según necesites */
-  display: flex;
+  position: relative;
+  width: 100%;
+  height: 7vw;
+  max-height: 6vh;
+  flex-direction: row;
   align-items: center;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 /* El contenido principal debajo de las barras superiores */
@@ -163,11 +169,13 @@ i{
   justify-content: flex-end;
   align-items: center;
   height: 100%;
-  box-shadow: var(--shadow);
   width: 100%;
+  top: -35px;
 }
 
 .navbar-list {
+  top: 8px;
+  display: flex;
   position: relative;
   padding-right: 0.6rem;
   overflow: hidden;
@@ -183,7 +191,7 @@ i{
 .navbar-list li a {
   font-size: 1rem;
   font-weight: 500;
-  color: var(--black);
+  color: white;
   text-decoration: none;
 }
 
@@ -200,42 +208,33 @@ i{
   font-weight: 500;
   width: 50px;
   border-radius: 50px;
-  /* background-color: white;
-  box-shadow: var(--shadow); */
   cursor: pointer;
-  border: 1px solid var(--secondary);
-  transition: box-shadow 0.2s ease-in, background-color 0.2s ease-in,
-    border 0.3s;
+  border: 1px solid;
 }
 
 .profile-dropdown-btn:hover {
-  background-color: var(--secondary-light-2);
-  box-shadow: var(--shadow);
   width: fit-content;
-  color: #232323;
-  padding-right: 0.5rem;
+  color: white;
   span{
-    display: contents;
-    
+    margin-top: 3px;
+    display: block;
   }
 }
 
 .profile-dropdown-btn.show-caption {
-  background-color: var(--secondary-light-2);
-  box-shadow: var(--shadow);
   width: fit-content;
-  color: #232323;
-  padding-right: 0.5rem;
+  color: white;
   span{
-    display: contents;
+    margin-top: 3px;
+    display: block;
   }
 }
 
 .profile-img {
-  width: 8vw;
-  height: 8vw;
-  max-width: 50px;
-  max-height: 50px;
+  width: 7vw;
+  height: 7vw;
+  max-width: 45px;
+  max-height: 45px;
   border-radius: 50%;
   overflow: hidden;
   position: relative;
@@ -247,25 +246,9 @@ i{
   object-fit: cover;
 }
 
-.profile-img .status-icon {
-  position: absolute;
-  right: 0;
-  bottom: 0.3rem;
-  font-size: 0.7rem;
-  color: greenyellow;
-}
-
-.profile-img i {
-  position: absolute;
-  right: 0;
-  bottom: 0.3rem;
-  font-size: 0.7rem;
-  color: greenyellow;
-}
-
 .profile-dropdown-btn span {
   margin: 0;
-  padding: 12px 0;
+  padding: 10px 0;
   text-align: center;
   height: 42px;
   font-family: 'Fredoka One';
@@ -288,6 +271,8 @@ i{
 }
 
 .profile-dropdown-list-item.hover{
+  width: fit-content;
+  transition: background-color 0.2s ease-in, padding-left 0.2s;
   span{
     display: contents;
   }
@@ -303,13 +288,11 @@ i{
 }
 
 .profile-dropdown-list-item a i {
-  font-size: 0.5rem;
-  width: 1.5rem;
-  height: 1.5rem;
-  background-color: var(--secondary);
+  font-size: 1rem;
+  width: 1.8rem;
+  height: 1.8rem;
   color: white;
-  line-height: 2.3rem;
+  line-height: 1.8rem;
   text-align: center;
   border-radius: 50%;
-  transition: margin-right 0.3s;
-}
+  transition: margin-right 0.3s;}

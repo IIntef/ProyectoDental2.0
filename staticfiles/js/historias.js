@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.username) {
+                    document.getElementById('id_tipo').value = data.tipo;
                     document.getElementById('id_username').value = data.username;
                     document.getElementById('id_email').value = data.email;
                     document.getElementById('id_direccion').value = data.direccion;

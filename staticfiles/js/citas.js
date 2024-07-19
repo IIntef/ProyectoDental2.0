@@ -1,7 +1,4 @@
-// main.js
-
 document.addEventListener('DOMContentLoaded', function() {
-
     function cancelarCita(citaId) {
         if (confirm('¿Estás seguro de cancelar el agendamiento de esta cita?')) {
             const url = `/cancelar-cita/${citaId}/`;
@@ -14,19 +11,20 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (response.ok) {
-                    alert('Cita cancelada exitosamente.');
-                    // Recargar horas disponibles después de cancelar la cita
-                    const fechaSeleccionada = fechaInput.value; // Obtener la fecha seleccionada
-                    if (fechaSeleccionada) {
-                        cargarHorasDisponibles(fechaSeleccionada);
-                    }
+                    return response.json();
                 } else {
-                    alert('Ocurrió un error al cancelar la cita.');
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Ocurrió un error al cancelar la cita.');
+                    });
                 }
+            })
+            .then(data => {
+                alert('Cita cancelada exitosamente.');
+                window.location.reload();
             })
             .catch(error => {
                 console.error('Error en la solicitud:', error);
-                alert('Ocurrió un error en la solicitud.');
+                alert(error.message);
             });
         }
     }
@@ -43,39 +41,24 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (response.ok) {
-                    alert('Cita actualizada correctamente.');
-                    // Recargar horas disponibles después de confirmar la actualización
-                    const fechaSeleccionada = fechaInput.value; // Obtener la fecha seleccionada
-                    if (fechaSeleccionada) {
-                        cargarHorasDisponibles(fechaSeleccionada);
-                    }
+                    return response.json();
                 } else {
-                    alert('Ocurrió un error al confirmar la actualización de la cita.');
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Ocurrió un error al confirmar la actualización de la cita.');
+                    });
                 }
+            })
+            .then(data => {
+                alert('Cita actualizada correctamente.');
+                window.location.reload();
             })
             .catch(error => {
                 console.error('Error en la solicitud:', error);
-                alert('Ocurrió un error en la solicitud.');
+                alert(error.message);
             });
         }
     }
 
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    // Event listener para botones de cancelar cita
     const cancelButtons = document.querySelectorAll('.cancelar-cita-btn');
     cancelButtons.forEach(button => {
         button.addEventListener('click', function(e) {
@@ -94,6 +77,22 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmarActualizacion(citaId);
         });
     });
+    
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 
     const fechaInput = document.getElementById('fecha');
     const horaContainer = document.getElementById('hora');
@@ -108,14 +107,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const fechaValida = selectedDates.length > 0;
 
             if (fechaValida) {
-                cargarHorasDisponibles(dateStr); // Cargar las horas disponibles al cambiar la fecha
+                cargarHorasDisponibles(dateStr);
             } else {
-                horaContainer.innerHTML = '';  // Limpiar opciones si no hay fecha válida seleccionada
+                horaContainer.innerHTML = '';
             }
         }
     });
 
-    // Función para cargar las horas disponibles según la fecha seleccionada
     function cargarHorasDisponibles(fechaSeleccionada) {
         fetch(`/get-horas-disponibles/?fecha=${fechaSeleccionada}`)
             .then(response => response.json())
@@ -155,5 +153,6 @@ document.addEventListener('DOMContentLoaded', function() {
         cargarHorasDisponibles(fechaInicial);
     }
 
+    // Inicializar los event listeners de los botones
+    agregarEventListenersBotones();
 });
-
