@@ -1,0 +1,27 @@
+{% extends 'index.html' %}
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v1.2">
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h4 class="card-title">Historias Clínicas</h4>
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+      <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+      Si desea crear un nuevo usuario ingrese aquí: <a href="{% url 'crearcuentas' %}">Crear Usuario</a>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% include 'formhistorias.html' %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/historias.js' %}?v1.2"></script>
+{% endblock %}

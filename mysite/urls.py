@@ -18,13 +18,20 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
-from login import views
+from inicio import views
 from django.urls import path
 from django.contrib.auth import views as auth_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('login.urls')),
+    path('', include('citas.urls')),
+    path('', include('cuentas.urls')),
+    path('', include('dashboard.urls')),
+    path('', include('fechas.urls')),
+    path('', include('historiaclinica.urls')),
+    path('', include('inicio.urls')),
+    path('', include('inventario.urls')),
+    path('', include('passwordreset.urls')),
 ]
 
 if settings.DEBUG:

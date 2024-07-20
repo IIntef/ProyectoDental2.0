@@ -17,6 +17,9 @@ html, body {
 }
 
 body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Times New Roman', Times, serif, Helvetica, Arial, sans-serif;
   display: flex;
   min-height: 100vh;
   width: 100%;
@@ -24,14 +27,15 @@ body {
 }
 
 header {
-  position: sticky;
+  position: relative;
   background-color: #232323;
-  width: fit-content; /* Ajusta según el ancho que desees */
+  width: fit-content;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  
+  z-index: 1;
 }
 
 .content {
@@ -42,26 +46,36 @@ header {
 }
 
 .header2 {
-  position: sticky;
+  position: relative;
+  height: fit-content;
 }
 
 .headersup {
+  display: flex;
   background-color: #383A3F;
   color: white;
-  padding: 15px;
-  display: flex;
   justify-content: space-between;
+  padding: 15px;
+  position: relative;
+  width: 100%;
+  height: 9vw;
+  max-height: 8vh;
+  flex-direction: row;
   align-items: center;
 }
 
 .headerinf {
+  display: flex;
   background-color: #272727;
   color: white;
-  padding: 10px 15px;
-  height: 6vh; /* Ajusta según necesites */
-  display: flex;
+  position: relative;
+  width: 100%;
+  height: 7vw;
+  max-height: 6vh;
+  flex-direction: row;
   align-items: center;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 /* El contenido principal debajo de las barras superiores */
@@ -152,20 +166,22 @@ i{
 
 .navbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: right;
   align-items: center;
-  height: 100%;
   width: 100%;
-  top: -40px;
 }
 
 .navbar-list {
-  top: 12px;
+  padding-top: 15px;
   display: flex;
   position: relative;
   padding-right: 0.6rem;
   overflow: hidden;
   width: 0;
+}
+.profile-dropdown {
+  position: relative;
+  width: fit-content;
 }
 
 
@@ -177,15 +193,13 @@ i{
 .navbar-list li a {
   font-size: 1rem;
   font-weight: 500;
-  color: var(black);
+  color: white;
   text-decoration: none;
 }
 
 .profile-dropdown {
-  position: absolute; /* Posiciona el dropdown relativo al contenedor .headersup */
-  top: 100%; /* Justo debajo del contenedor .headersup, pero dentro de él */
-  right: 0; /* Alineado a la derecha del contenedor .headersup */
-  z-index: 1000; /* Asegura que esté por encima de otros elementos */
+  position: relative;
+  width: fit-content;
 }
 
 .profile-dropdown-btn {
@@ -202,20 +216,19 @@ i{
 
 .profile-dropdown-btn:hover {
   width: fit-content;
-  color: #232323;
-  padding-right: 0.5rem;
+  color: white;
   span{
+    margin-top: 3px;
     display: block;
-    
   }
 }
 
 .profile-dropdown-btn.show-caption {
   width: fit-content;
-  color: #232323;
-  padding-right: 0.5rem;
+  color: white;
   span{
-    display: contents;
+    margin-top: 3px;
+    display: block;
   }
 }
 
@@ -260,6 +273,8 @@ i{
 }
 
 .profile-dropdown-list-item.hover{
+  width: fit-content;
+  transition: background-color 0.2s ease-in, padding-left 0.2s;
   span{
     display: contents;
   }
