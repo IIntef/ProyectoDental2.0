@@ -9,8 +9,7 @@ from inicio.forms import UserForm
 from inicio.models import UserProfile
 from inicio import views as traer
 
-@login_required
-@user_passes_test(traer.es_superusuario, login_url='acceso_denegado')
+@login_required(login_url='acceso_denegado')
 def fetch_user_details(request):
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         numero = request.GET.get('numero')

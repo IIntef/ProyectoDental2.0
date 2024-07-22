@@ -119,6 +119,9 @@ class Inventario(models.Model):
         (2, 'Agotado'),
         (3, 'Por Recibir'),
     )
+    
+    
+    
 
     producto = models.CharField(max_length=150, blank=True) 
     cantidad = models.FloatField(blank=True) 

@@ -6,19 +6,16 @@ from inicio.forms import UserForm
 from inicio.models import UserProfile
 import inicio.views as traer
 
-@login_required
-@user_passes_test(traer.es_superusuario, login_url='acceso_denegado')
+@login_required(login_url='acceso_denegado')
 def signout(request):
     logout(request)
     return redirect('loginregister')
 
-@login_required
-@user_passes_test(traer.es_superusuario, login_url='acceso_denegado')
+@login_required(login_url='acceso_denegado')
 def dashboard(request):
     return render(request, 'dashboard.html', {'user': request.user})
 
-@login_required
-@user_passes_test(traer.es_superusuario, login_url='acceso_denegado')
+@login_required(login_url='acceso_denegado')
 def configuracion(request, id):
     perfil_usuario = UserProfile.objects.get(id=id)
     if request.method == 'POST':
@@ -30,12 +27,10 @@ def configuracion(request, id):
         form = UserForm(instance=perfil_usuario)
     return render(request, 'configuracion.html', {'form': form})
 
-@login_required
-@user_passes_test(traer.es_superusuario, login_url='acceso_denegado')
+@login_required(login_url='acceso_denegado')
 def correo(request):
     return render(request, 'correo.html')
 
-@login_required
-@user_passes_test(traer.es_superusuario, login_url='acceso_denegado')
+@login_required(login_url='acceso_denegado')
 def calendario(request):
     return render(request, 'calendario.html')

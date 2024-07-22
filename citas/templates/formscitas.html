@@ -10,19 +10,19 @@
   {% csrf_token %}
 
   <div class="mb-3">
-    <label for="fecha" class="form-label">Fecha</label>
+    <label for="fecha" class="form-label">Fecha: </label>
     <input type="text" class="form-control" id="fecha" name="fecha" required>
   </div>
 
   <div class="mb-3">
-    <label class="form-label">Hora</label>
+    <label class="form-label">Hora: </label>
     <div id="hora" class="form-check">
       <!-- Las opciones se llenarán con JavaScript -->
     </div>
   </div>
 
   <div class="mb-3">
-    <label for="motivo" class="form-label">Motivo</label>
+    <label for="motivo" class="form-label">Motivo: </label>
     <select class="form-select" name="motivo" id="motivo" required>
       {% for value, display_name in form.fields.motivo.choices %}
       <option value="{{ value }}">{{ display_name }}</option>
@@ -31,7 +31,7 @@
 
     {% if is_superuser %}
     <div class="mb-3">
-      <label for="paciente" class="form-label">Seleccionar Paciente</label>
+      <label for="paciente" class="form-label">Seleccionar Paciente: </label>
       <select class="form-select" name="paciente" id="paciente" required>
         {% for value, display_username in form.fields.paciente.choices %}
         <option value="{{ value }}">{{ display_username }}</option>
@@ -40,7 +40,7 @@
     </div>
     {% else %}
     <input type="hidden" name="paciente" value="{{ cita.paciente.id }}">
-    <p>Seleccionado: {{ cita.paciente.get_username }}</p>
+    <p>{{ cita.paciente.get_username }}</p>
     {% endif %}
 
   </div>

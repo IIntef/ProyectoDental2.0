@@ -6,8 +6,7 @@ from inicio.forms import ValoracionForm, UserForm
 from inicio.models import UserProfile, Valoracion
 import inicio.views as traer
 
-@login_required
-@user_passes_test(traer.es_superusuario, login_url='acceso_denegado')
+@login_required(login_url='acceso_denegado')
 def listhistorias(request):
     if request.user.is_superuser:
         historias = Valoracion.objects.all()
