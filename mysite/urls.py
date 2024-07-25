@@ -32,6 +32,8 @@ urlpatterns = [
     path('', include('inicio.urls')),
     path('', include('inventario.urls')),
     path('', include('passwordreset.urls')),
+    path('gmail/', include('gmail_integration.urls')),
+
 ]
 
 if settings.DEBUG:
