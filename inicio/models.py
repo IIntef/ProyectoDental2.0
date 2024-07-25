@@ -161,6 +161,7 @@ class Cita(models.Model):
     motivo = models.CharField(max_length=20, choices=MOTIVO_CHOICES, default='protesis')
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='programada')
     asistio = models.BooleanField(default=False)
+    google_event_id = models.CharField(max_length=255, blank=True, null=True)  # Campo nuevo
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None

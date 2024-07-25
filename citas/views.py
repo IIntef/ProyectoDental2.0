@@ -142,6 +142,7 @@ def cancelar_cita(request, cita_id):
         print(f"Error al cancelar cita: {str(e)}")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+
 @login_required(login_url='acceso_denegado')
 def crearcitas(request):
     try:
@@ -187,7 +188,7 @@ def crearcitas(request):
             event = {
                 'summary': 'Cita Programada',
                 'location': 'Tu ubicación aquí',
-                'description': f'Cita programada para {cita.paciente.username}',
+                'description': f'Cita ID: {cita.id}\nCita programada para {cita.paciente.username}',
                 'start': {
                     'dateTime': fecha_datetime.isoformat(),
                     'timeZone': 'America/Bogota',
@@ -210,8 +211,10 @@ def crearcitas(request):
             }
 
             try:
-                event = service.events().insert(calendarId='primary', body=event).execute()
-                print('Evento creado: %s' % (event.get('htmlLink')))
+                created_event = service.events().insert(calendarId='primary', body=event).execute()
+                cita.google_event_id = created_event['id']
+                cita.save()
+                print('Evento creado: %s' % (created_event.get('htmlLink')))
                 messages.success(request, 'Cita creada exitosamente y evento añadido a Google Calendar.')
             except HttpError as e:
                 print(f"Error al crear evento en Google Calendar: {str(e)}")
@@ -268,7 +271,6 @@ def listcitas(request):
     citas = Cita.objects.all() if request.user.is_superuser else Cita.objects.filter(paciente=request.user)
     return render(request, 'listcitas.html', {'citas': citas})
 
-@login_required(login_url='acceso_denegado')
 def editarcitas(request, cita_id):
     cita = get_object_or_404(Cita, id=cita_id)
     fecha_hora_original = cita.fecha_hora
@@ -296,28 +298,57 @@ def editarcitas(request, cita_id):
                 
                 nueva_cita.fecha_hora = nueva_fecha_hora
 
+                # Eliminar el evento viejo en Google Calendar
+                service = get_google_calendar_service(request)
+                if isinstance(service, HttpResponseRedirect):
+                    return service
+
+                if cita.google_event_id:
+                    try:
+                        service.events().delete(calendarId='primary', eventId=cita.google_event_id).execute()
+                        print(f"Evento de Google Calendar eliminado para la cita {cita_id}")
+                    except HttpError as e:
+                        print(f"Error al eliminar el evento: {str(e)}")
+
             nueva_cita.save()
 
-            # Actualizar el evento en Google Calendar
-            service = get_google_calendar_service(request)
-            if isinstance(service, HttpResponseRedirect):
-                return service  # Esto redirigirá al usuario a la página de autorización de Google
+            # Crear un nuevo evento en Google Calendar
+            fecha_datetime = datetime.combine(nueva_fecha, nueva_hora)
+            event = {
+                'summary': 'Cita Programada',
+                'location': 'Tu ubicación aquí',
+                'description': f'Cita ID: {nueva_cita.id}\nCita programada para {nueva_cita.paciente.username}',
+                'start': {
+                    'dateTime': fecha_datetime.isoformat(),
+                    'timeZone': 'America/Bogota',
+                },
+                'end': {
+                    'dateTime': (fecha_datetime + timedelta(hours=1)).isoformat(),
+                    'timeZone': 'America/Bogota',
+                },
+                'attendees': [
+                    {'email': nueva_cita.paciente.email},
+                    {'email': request.user.email},
+                ],
+                'reminders': {
+                    'useDefault': False,
+                    'overrides': [
+                        {'method': 'email', 'minutes': 24 * 60},
+                        {'method': 'popup', 'minutes': 10},
+                    ],
+                },
+            }
 
-            # Buscar el evento por su descripción
-            events_result = service.events().list(calendarId='primary', q=f'Cita ID: {cita_id}').execute()
-            events = events_result.get('items', [])
+            try:
+                new_event = service.events().insert(calendarId='primary', body=event).execute()
+                print('Nuevo evento creado: %s' % (new_event.get('htmlLink')))
+                nueva_cita.google_event_id = new_event['id']
+                nueva_cita.save()
+                messages.success(request, 'Cita actualizada exitosamente y evento de Google Calendar actualizado.')
+            except HttpError as e:
+                print(f"Error al crear nuevo evento en Google Calendar: {str(e)}")
+                messages.warning(request, 'Cita actualizada exitosamente, pero hubo un problema al añadir el evento a Google Calendar.')
 
-            if events:
-                event = events[0]
-                fecha_datetime = datetime.combine(nueva_fecha, nueva_hora)
-                event['start'] = {'dateTime': fecha_datetime.isoformat(), 'timeZone': 'America/Bogota'}
-                event['end'] = {'dateTime': (fecha_datetime + timedelta(hours=1)).isoformat(), 'timeZone': 'America/Bogota'}
-                event['description'] = f'Cita ID: {cita_id}\nCita programada para {nueva_cita.paciente.username}'
-
-                updated_event = service.events().update(calendarId='primary', eventId=event['id'], body=event).execute()
-                print(f'Evento actualizado: {updated_event["htmlLink"]}')
-
-            messages.success(request, 'Cita actualizada exitosamente y evento de Google Calendar actualizado.')
             return redirect('listcitas')
         else:
             print(form.errors)
@@ -335,4 +366,5 @@ def editarcitas(request, cita_id):
         'cita': cita,
     }
     return render(request, 'editarcitas.html', contexto)
+
 
