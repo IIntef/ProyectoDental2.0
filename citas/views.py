@@ -9,70 +9,107 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST, require_GET
 from django.urls import reverse
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 from inicio.forms import CitaForm
 from inicio.models import UserProfile, Cita, Fecha
 from inicio import views as traer
-import logging
 
-# Configuración de Google Calendar
-CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'config/client_secret.json')
-TOKEN_FILE = os.path.join(settings.BASE_DIR, 'token.json')
-SCOPES = ['https://www.googleapis.com/auth/calendar']
+CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'citas/config/credentials.json')
+SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.readonly']
 
 def get_google_calendar_service(request):
-    try:
-        logging.info("Iniciando get_google_calendar_service")
-        creds = None
-        if os.path.exists(TOKEN_FILE):
-            logging.info(f"TOKEN_FILE existe: {TOKEN_FILE}")
-            creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
-        else:
-            logging.warning(f"TOKEN_FILE no existe: {TOKEN_FILE}")
-
-        if not creds or not creds.valid:
-            logging.info("Credenciales no válidas o no existen")
-            if creds and creds.expired and creds.refresh_token:
-                logging.info("Intentando refrescar credenciales")
-                creds.refresh(Request())
-            else:
-                logging.info("Iniciando flujo de autorización")
-                flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
-                flow.redirect_uri = request.build_absolute_uri(reverse('dashboardcalendario:calendario'))
-                
-                authorization_url, _ = flow.authorization_url(prompt='consent')
-                logging.info(f"URL de autorización generada: {authorization_url}")
-                return redirect(authorization_url)
-
-            logging.info("Guardando nuevas credenciales en TOKEN_FILE")
-            with open(TOKEN_FILE, 'w') as token:
-                token.write(creds.to_json())
-
-        logging.info("Construyendo servicio de Calendar")
-        service = build('calendar', 'v3', credentials=creds)
-        return service
+    if 'credentials' not in request.session:
+        return redirect('initiate_oauth')
     
-    except Exception as e:
-        logging.error(f"Error en get_google_calendar_service: {str(e)}", exc_info=True)
-        return None
+    credentials = Credentials(**request.session['credentials'])
+    
+    if not credentials.valid:
+        if credentials.expired and credentials.refresh_token:
+            credentials.refresh(Request())
+            request.session['credentials'] = {
+                'token': credentials.token,
+                'refresh_token': credentials.refresh_token,
+                'token_uri': credentials.token_uri,
+                'client_id': credentials.client_id,
+                'client_secret': credentials.client_secret,
+                'scopes': credentials.scopes
+            }
+        else:
+            return redirect('initiate_oauth')
+    
+    return build('calendar', 'v3', credentials=credentials)
 
+def initiate_oauth(request):
+    redirect_uri = request.build_absolute_uri(reverse('oauth2callback'))
+    print(f"Redirect URI: {redirect_uri}")
+    flow = Flow.from_client_secrets_file(
+        CLIENT_SECRETS_FILE,
+        scopes=SCOPES,
+        redirect_uri=redirect_uri
+    )
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true',
+    )
+    request.session['state'] = state
+    print(f"Authorization URL: {authorization_url}")
+    return redirect(authorization_url)
+
+import os
+from google_auth_oauthlib.flow import Flow
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.contrib import messages
 
 def oauth2callback(request):
-    flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
-    flow.redirect_uri = request.build_absolute_uri(reverse('calendario'))
-
-    flow.fetch_token(code=request.GET.get('code'))
-
-    creds = flow.credentials
-    with open(TOKEN_FILE, 'w') as token:
-        token.write(creds.to_json())
-
-    return redirect('home')
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+    
+    redirect_uri = request.build_absolute_uri(reverse('oauth2callback'))
+    print(f"Redirect URI in oauth2callback: {redirect_uri}")
+    print(f"Full request URL: {request.build_absolute_uri()}")
+    
+    state = request.session.get('state')
+    if not state:
+        return redirect('initiate_oauth')
+    
+    flow = Flow.from_client_secrets_file(
+        CLIENT_SECRETS_FILE,
+        scopes=SCOPES,
+        state=state,
+        redirect_uri=redirect_uri
+    )
+    
+    try:
+        flow.fetch_token(authorization_response=request.build_absolute_uri())
+        credentials = flow.credentials
+        
+        request.session['credentials'] = {
+            'token': credentials.token,
+            'refresh_token': credentials.refresh_token,
+            'token_uri': credentials.token_uri,
+            'client_id': credentials.client_id,
+            'client_secret': credentials.client_secret,
+            'scopes': credentials.scopes
+        }
+        
+        messages.success(request, 'Autenticación con Google Calendar completada exitosamente.')
+        return redirect('listcitas')
+    
+    except Warning as w:
+        print(f"Advertencia durante la autenticación: {str(w)}")
+        messages.warning(request, f'Se produjo una advertencia durante la autenticación: {str(w)}')
+        # Puedes decidir continuar o manejar esto de otra manera
+        return redirect('listcitas')
+    
+    except Exception as e:
+        print(f"Error durante la autenticación: {str(e)}")
+        messages.error(request, f'Error durante la autenticación: {str(e)}')
+        return redirect('initiate_oauth')
 
 @login_required(login_url='acceso_denegado')
 @require_POST
@@ -81,6 +118,20 @@ def cancelar_cita(request, cita_id):
         cita = Cita.objects.get(id=cita_id)
         resultado = cita.cancelar_cita()
         if resultado:
+            # Eliminar el evento de Google Calendar
+            service = get_google_calendar_service(request)
+            if isinstance(service, HttpResponseRedirect):
+                return service  # Esto redirigirá al usuario a la página de autorización de Google
+
+            # Buscar el evento por su descripción (asumiendo que guardamos el ID de la cita en la descripción)
+            events_result = service.events().list(calendarId='primary', q=f'Cita ID: {cita_id}').execute()
+            events = events_result.get('items', [])
+
+            if events:
+                event = events[0]
+                service.events().delete(calendarId='primary', eventId=event['id']).execute()
+                print(f"Evento de Google Calendar eliminado para la cita {cita_id}")
+
             print(f"Cita {cita_id} cancelada. Nueva disponibilidad: {cita.fecha_hora.disponible}")
             return JsonResponse({'status': 'success'}, status=200)
         else:
@@ -129,10 +180,6 @@ def crearcitas(request):
             if isinstance(service, HttpResponseRedirect):
                 return service  # Esto redirigirá al usuario a la página de autorización de Google
 
-            if service is None:
-                messages.error(request, 'No se pudo conectar con Google Calendar. Por favor, intente más tarde.')
-                return redirect('listcitas')
-
             fecha = formulario.cleaned_data['fecha']
             hora = formulario.cleaned_data['hora']
             fecha_datetime = datetime.combine(fecha, hora)
@@ -166,7 +213,7 @@ def crearcitas(request):
                 event = service.events().insert(calendarId='primary', body=event).execute()
                 print('Evento creado: %s' % (event.get('htmlLink')))
                 messages.success(request, 'Cita creada exitosamente y evento añadido a Google Calendar.')
-            except Exception as e:
+            except HttpError as e:
                 print(f"Error al crear evento en Google Calendar: {str(e)}")
                 messages.warning(request, 'Cita creada exitosamente, pero hubo un problema al añadir el evento a Google Calendar.')
 
@@ -248,9 +295,29 @@ def editarcitas(request, cita_id):
                 nueva_fecha_hora.save()
                 
                 nueva_cita.fecha_hora = nueva_fecha_hora
-            
+
             nueva_cita.save()
-            messages.success(request, 'Cita actualizada exitosamente.')
+
+            # Actualizar el evento en Google Calendar
+            service = get_google_calendar_service(request)
+            if isinstance(service, HttpResponseRedirect):
+                return service  # Esto redirigirá al usuario a la página de autorización de Google
+
+            # Buscar el evento por su descripción
+            events_result = service.events().list(calendarId='primary', q=f'Cita ID: {cita_id}').execute()
+            events = events_result.get('items', [])
+
+            if events:
+                event = events[0]
+                fecha_datetime = datetime.combine(nueva_fecha, nueva_hora)
+                event['start'] = {'dateTime': fecha_datetime.isoformat(), 'timeZone': 'America/Bogota'}
+                event['end'] = {'dateTime': (fecha_datetime + timedelta(hours=1)).isoformat(), 'timeZone': 'America/Bogota'}
+                event['description'] = f'Cita ID: {cita_id}\nCita programada para {nueva_cita.paciente.username}'
+
+                updated_event = service.events().update(calendarId='primary', eventId=event['id'], body=event).execute()
+                print(f'Evento actualizado: {updated_event["htmlLink"]}')
+
+            messages.success(request, 'Cita actualizada exitosamente y evento de Google Calendar actualizado.')
             return redirect('listcitas')
         else:
             print(form.errors)
@@ -268,3 +335,4 @@ def editarcitas(request, cita_id):
         'cita': cita,
     }
     return render(request, 'editarcitas.html', contexto)
+
