@@ -156,8 +156,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # Reemplaza con el servidor SMTP de tu proveedor
 EMAIL_PORT = 587  # Puerto SMTP, generalmente 587 para TLS
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'correaedwin159@gmail.com'  # Reemplaza con tu dirección de correo
-EMAIL_HOST_PASSWORD = 'meis fonl bnky tlni'  # Reemplaza con tu contraseña de correo
+EMAIL_HOST_USER = 'facturacionldsg@gmail.com'  # Reemplaza con tu dirección de correo
+EMAIL_HOST_PASSWORD = 'jdlj vvqw rwcp lots'  # Reemplaza con tu contraseña de correo
 
 # Configuración para el restablecimiento de contraseña
 PASSWORD_RESET_TIMEOUT = 3600  # 1 hora en segundos
