@@ -8,6 +8,7 @@ from django.core.mail import send_mail
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST, require_GET
+from django.urls import reverse
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow
@@ -17,6 +18,7 @@ from google.auth.transport.requests import Request
 from inicio.forms import CitaForm
 from inicio.models import UserProfile, Cita, Fecha
 from inicio import views as traer
+import logging
 
 # Configuración de Google Calendar
 CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'config/client_secret.json')
@@ -24,28 +26,45 @@ TOKEN_FILE = os.path.join(settings.BASE_DIR, 'token.json')
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 def get_google_calendar_service(request):
-    creds = None
-    if os.path.exists(TOKEN_FILE):
-        creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
-
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+    try:
+        logging.info("Iniciando get_google_calendar_service")
+        creds = None
+        if os.path.exists(TOKEN_FILE):
+            logging.info(f"TOKEN_FILE existe: {TOKEN_FILE}")
+            creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
         else:
-            flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
-            flow.redirect_uri = request.build_absolute_uri('/calendario')
-            
-            authorization_url, _ = flow.authorization_url(prompt='consent')
-            return redirect(authorization_url)
+            logging.warning(f"TOKEN_FILE no existe: {TOKEN_FILE}")
 
-        with open(TOKEN_FILE, 'w') as token:
-            token.write(creds.to_json())
+        if not creds or not creds.valid:
+            logging.info("Credenciales no válidas o no existen")
+            if creds and creds.expired and creds.refresh_token:
+                logging.info("Intentando refrescar credenciales")
+                creds.refresh(Request())
+            else:
+                logging.info("Iniciando flujo de autorización")
+                flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
+                flow.redirect_uri = request.build_absolute_uri(reverse('dashboardcalendario:calendario'))
+                
+                authorization_url, _ = flow.authorization_url(prompt='consent')
+                logging.info(f"URL de autorización generada: {authorization_url}")
+                return redirect(authorization_url)
 
-    return build('calendar', 'v3', credentials=creds)
+            logging.info("Guardando nuevas credenciales en TOKEN_FILE")
+            with open(TOKEN_FILE, 'w') as token:
+                token.write(creds.to_json())
+
+        logging.info("Construyendo servicio de Calendar")
+        service = build('calendar', 'v3', credentials=creds)
+        return service
+    
+    except Exception as e:
+        logging.error(f"Error en get_google_calendar_service: {str(e)}", exc_info=True)
+        return None
+
 
 def oauth2callback(request):
     flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
-    flow.redirect_uri = request.build_absolute_uri('/calendario')
+    flow.redirect_uri = request.build_absolute_uri(reverse('calendario'))
 
     flow.fetch_token(code=request.GET.get('code'))
 
@@ -107,9 +126,12 @@ def crearcitas(request):
 
             # Crear evento en Google Calendar
             service = get_google_calendar_service(request)
-            
             if isinstance(service, HttpResponseRedirect):
-                return service
+                return service  # Esto redirigirá al usuario a la página de autorización de Google
+
+            if service is None:
+                messages.error(request, 'No se pudo conectar con Google Calendar. Por favor, intente más tarde.')
+                return redirect('listcitas')
 
             fecha = formulario.cleaned_data['fecha']
             hora = formulario.cleaned_data['hora']
@@ -163,7 +185,7 @@ def crearcitas(request):
     return render(request, 'crearcitas.html', contexto)
 
 @login_required
-@user_passes_test(traer.es_superusuario, login_url='acceso_denegado')
+@user_passes_test(traer.es_superusuario, login_url='acceso-denegado')
 @require_POST
 def confirmar_actualizacion_cita(request, cita_id):
     try:
