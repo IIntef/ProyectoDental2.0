@@ -1,0 +1,16 @@
+.compose-email {
+    width: 30%;
+}
+
+.email-container {
+    display: flex;
+    justify-content: center;
+}
+
+.inbox {
+    overflow-y: auto; /* Activa el scroll vertical */
+    border: 1px solid #ddd; /* Opcional: para ver los límites del contenedor */
+    border-radius: 5px; /* Opcional: para bordes redondeados */
+    padding: 10px; /* Espacio interno */
+}
+

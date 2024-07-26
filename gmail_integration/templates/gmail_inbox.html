@@ -1,27 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gmail Inbox</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Gmail Inbox</h1>
-        <ul class="list-group">
-            {% for email in email_list %}
-                <li class="list-group-item">
-                    <h5 class="mb-1">{{ email.subject }}</h5>
-                    <p class="mb-1">{{ email.snippet }}</p>
-                </li>
-            {% endfor %}
-        </ul>
+{% extends 'index.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/gmail.css' %}?v1.1">
+{% endblock %}
+
+{% block titulo %}
+GMAIL - CORREOS
+{% endblock %}
+
+{% block content %}
+
+<div class="email-container">
+    <div class="card inbox">
+        <div class="card-body">
+            <h4 class="card-title">Bandeja de Entrada</h4>
+            <ul>
+                {% for email in email_list %}
+                    <li>
+                        <h5 class="mb-1">{{ email.subject }}</h5>
+                        <p class="mb-1">{{ email.snippet }}</p>
+                    </li> <br>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+
+    <div class="card compose-email">
+        <div class="card-body">
+            <h4 class="card-title">Enviar Nuevo Correo</h4>
+            <form method="post" action="{% url 'send_email' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="to">Para:</label>
+                    <input type="email" class="form-control" id="to" name="to" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject">Asunto:</label>
+                    <input type="text" class="form-control" id="subject" name="subject" required>
+                </div>
+                <div class="form-group">
+                    <label for="body">Mensaje:</label>
+                    <textarea class="form-control" id="body" name="body" rows="5" required></textarea>
+                </div>
+                <a class="btn btn-warning" href="{% url 'dashboard' %}" role="button">Volver</a>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/busqueda.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+{% endblock %}
+
+    

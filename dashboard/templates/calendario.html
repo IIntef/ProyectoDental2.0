@@ -1,0 +1,47 @@
+{% extends 'index.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block titulo %}
+    <title>Calendario</title>
+{% endblock %}
+
+{% block content %}
+    <h1>Calendario</h1>
+    <div id="calendar"></div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/busqueda.js' %}"></script>
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: [
+                    {% for cita in citas %}
+                    {
+                        title: '{{ cita.paciente.username }}: {{ cita.motivo }}',
+                        start: '{{ cita.fecha_hora.fecha|date:"Y-m-d" }}T{{ cita.fecha_hora.hora|date:"H:i:s" }}',
+                        end: '{{ cita.fecha_hora.fecha|date:"Y-m-d" }}T{{ cita.fecha_hora.hora|date:"H:i:s" }}',
+                        backgroundColor: ({{ cita.estado|lower }} == 'cancelada') ? 'red' : 'blue',
+                        borderColor: ({{ cita.estado|lower }} == 'cancelada') ? 'darkred' : 'darkblue',
+                        textColor: 'white'
+                    },
+                    {% endfor %}
+                ],
+                // Puedes añadir más opciones aquí si es necesario
+            });
+
+            calendar.render();
+        });
+    </script>
+{% endblock %}

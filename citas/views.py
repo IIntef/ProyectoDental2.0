@@ -18,7 +18,7 @@ from inicio.forms import CitaForm
 from inicio.models import UserProfile, Cita, Fecha
 from inicio import views as traer
 
-CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'citas/config/credentials.json')
+CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'config/credentials.json')
 SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.readonly']
 
 def get_google_calendar_service(request):
@@ -131,7 +131,17 @@ def cancelar_cita(request, cita_id):
                 event = events[0]
                 service.events().delete(calendarId='primary', eventId=event['id']).execute()
                 print(f"Evento de Google Calendar eliminado para la cita {cita_id}")
-
+                
+            # Enviar correo
+            recipient_list = [cita.paciente.email, "facturacionldsg@gmail.com"]
+            send_mail(
+                'Cita Cancelada',
+                f'Hola {cita.paciente.username},\n\nTu cita para el {cita.fecha_hora} ha sido cancelada .\nSi deseas agendar otra cita ingresa a nuestra plataforma. \n\n Saludos,\nTu Equipo de Citas \n Laboratorio Dental - Sandra Gavíria',
+                settings.DEFAULT_FROM_EMAIL,
+                recipient_list,
+                fail_silently=False,
+            )
+            
             print(f"Cita {cita_id} cancelada. Nueva disponibilidad: {cita.fecha_hora.disponible}")
             return JsonResponse({'status': 'success'}, status=200)
         else:
@@ -167,7 +177,7 @@ def crearcitas(request):
             cita.save()
 
             # Enviar correo
-            recipient_list = [cita.paciente.email, request.user.email]
+            recipient_list = [cita.paciente.email, "facturacionldsg@gmail.com"]
             send_mail(
                 'Recordatorio de Cita Programada',
                 f'Hola {cita.paciente.username},\n\nTu cita ha sido programada para el {cita.fecha_hora}.\n\nSaludos,\nTu Equipo de Citas \n Laboratorio Dental - Sandra Gavíria',
@@ -199,7 +209,7 @@ def crearcitas(request):
                 },
                 'attendees': [
                     {'email': cita.paciente.email},
-                    {'email': request.user.email},
+                    {'email': "facturacionldsg@gmail.com"},
                 ],
                 'reminders': {
                     'useDefault': False,
@@ -296,6 +306,16 @@ def editarcitas(request, cita_id):
                 nueva_fecha_hora.disponible = False
                 nueva_fecha_hora.save()
                 
+                # Enviar correo
+                recipient_list = [cita.paciente.email, "facturacionldsg@gmail.com"]
+                send_mail(
+                    'Cita ReAgendada',
+                    f'Hola {cita.paciente.username},\n\nTu cita para el {fecha_hora_original} ha sido reagendada para el {nueva_fecha_hora}.\n\n Saludos,\nTu Equipo de Citas \n Laboratorio Dental - Sandra Gavíria',
+                    settings.DEFAULT_FROM_EMAIL,
+                    recipient_list,
+                    fail_silently=False,
+                )
+            
                 nueva_cita.fecha_hora = nueva_fecha_hora
 
                 # Eliminar el evento viejo en Google Calendar

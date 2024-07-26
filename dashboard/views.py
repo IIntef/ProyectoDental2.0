@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect
 
 from inicio.forms import UserForm
-from inicio.models import UserProfile
+from inicio.models import UserProfile, Cita
 import inicio.views as traer
 
 @login_required(login_url='acceso_denegado')
@@ -33,4 +33,7 @@ def correo(request):
 
 @login_required(login_url='acceso_denegado')
 def calendario(request):
-    return render(request, 'calendario.html')
+    citas = Cita.objects.filter(paciente=request.user)
+    for cita in citas:
+        print(f"Evento: {cita.paciente.username}, Fecha y hora: {cita.fecha_hora.fecha} {cita.fecha_hora.hora}, Estado: {cita.estado}")
+    return render(request, 'calendario.html', {'citas': citas})

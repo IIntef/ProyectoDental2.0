@@ -65,12 +65,14 @@
               </li>
               {% endif %}
 
+              {% if user.is_superuser %}
               <li class="profile-dropdown-list-item">
                 <a href="{% url 'gmail_inbox' %}">
                   <i class="fa-regular fa-envelope"></i>
                   <span>Correo</span>
                 </a>
               </li>
+              {% endif %}
 
               <li class="profile-dropdown-list-item">
                 <a href="{% url 'calendario' %}">
