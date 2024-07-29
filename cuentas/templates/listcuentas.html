@@ -8,10 +8,6 @@
         <div class="card-body">
             <h4 class="card-title">Pacientes Registrados</h4>
 
-            <div class="mb-3">
-                <input type="text" id="searchInput" class="form-control" placeholder="Buscar paciente...">
-            </div>
-            
             <!-- Filtros -->
             <div class="mb-3">
                 <select id="tipoDocumentoFilter" class="form-select">
@@ -20,8 +16,11 @@
                     <option value="T.I">Tarjeta de Identidad</option>
                     <option value="C.E">Cédula de Extranjería</option>
                     <option value="C.I">Carnet de Identidad</option>
-                    <!-- Agrega más opciones según tus tipos de documento -->
                 </select>
+            </div>
+            
+            <div class="mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar paciente...">
             </div>
 
             <div class="table-responsive">

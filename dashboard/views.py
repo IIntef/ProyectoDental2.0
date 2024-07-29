@@ -35,5 +35,6 @@ def correo(request):
 def calendario(request):
     citas = Cita.objects.filter(paciente=request.user)
     for cita in citas:
-        print(f"Evento: {cita.paciente.username}, Fecha y hora: {cita.fecha_hora.fecha} {cita.fecha_hora.hora}, Estado: {cita.estado}")
+        print(f"Evento: {cita.paciente.username}, Fecha y hora: {cita.fecha_hora.fecha} {cita.fecha_hora.hora}")
+        
     return render(request, 'calendario.html', {'citas': citas})

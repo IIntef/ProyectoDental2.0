@@ -13,6 +13,7 @@ from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from django.utils import timezone
 
 from inicio.forms import CitaForm
 from inicio.models import UserProfile, Cita, Fecha
@@ -155,24 +156,20 @@ def cancelar_cita(request, cita_id):
 
 @login_required(login_url='acceso_denegado')
 def crearcitas(request):
-    try:
-        user_profile = UserProfile.objects.get(numero=request.user.numero)
-    except UserProfile.DoesNotExist:
-        messages.error(request, 'No se encontró el perfil de usuario.')
-        return redirect('listcitas')
-
-    cita_programada = Cita.objects.filter(paciente=user_profile, estado='programada').exists()
-
-    if cita_programada and not request.user.is_superuser:
-        messages.error(request, 'Ya tienes una cita programada.')
-        return redirect('listcitas')
-
     if request.method == 'POST':
         formulario = CitaForm(request.POST, user=request.user)
         if formulario.is_valid():
+            paciente = formulario.cleaned_data['paciente'] if request.user.is_superuser else request.user
+
+            # Verificar si el paciente ya tiene una cita programada
+            cita_programada = Cita.objects.filter(paciente=paciente, estado='Programada').exists()
+
+            if cita_programada:
+                messages.error(request, f'El paciente {paciente.username} ya tiene una cita programada.')
+                return redirect('listcitas')
+
             cita = formulario.save(commit=False)
-            if not request.user.is_superuser:
-                cita.paciente = user_profile
+            cita.paciente = paciente
             cita.estado = 'programada'
             cita.save()
 
@@ -239,7 +236,7 @@ def crearcitas(request):
 
     contexto = {
         'form': formulario,
-        'titulo_formulario': 'Crear Cita' if not cita_programada else 'Editar Cita',
+        'titulo_formulario': 'Crear Cita',
         'is_superuser': request.user.is_superuser,
     }
     return render(request, 'crearcitas.html', contexto)
@@ -251,6 +248,23 @@ def confirmar_actualizacion_cita(request, cita_id):
     try:
         cita = Cita.objects.get(id=cita_id)
         resultado = cita.confirmar_actualizacion()
+        if resultado:
+            # Eliminar el evento de Google Calendar
+            service = get_google_calendar_service(request)
+            if isinstance(service, HttpResponseRedirect):
+                return service  # Esto redirigirá al usuario a la página de autorización de Google
+
+            # Buscar el evento por su descripción (asumiendo que guardamos el ID de la cita en la descripción)
+            events_result = service.events().list(calendarId='primary', q=f'Cita ID: {cita_id}').execute()
+            events = events_result.get('items', [])
+
+            if events:
+                event = events[0]
+                service.events().delete(calendarId='primary', eventId=event['id']).execute()
+                print(f"Evento de Google Calendar eliminado para la cita {cita_id}")
+            
+            print(f"Cita {cita_id} Completada.")
+    
         if resultado:
             return JsonResponse({'status': 'success'}, status=200)
         else:
@@ -278,6 +292,10 @@ def get_horas_disponibles(request):
 
 @login_required(login_url='acceso_denegado')
 def listcitas(request):
+    Cita.objects.filter(
+        fecha_hora__fecha__lt=timezone.now().date(),
+        estado='programada'
+    ).update(estado='inasistida')
     citas = Cita.objects.all() if request.user.is_superuser else Cita.objects.filter(paciente=request.user)
     return render(request, 'listcitas.html', {'citas': citas})
 

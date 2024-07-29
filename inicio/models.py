@@ -143,8 +143,9 @@ class Fecha(models.Model):
 class Cita(models.Model):
     ESTADO_CHOICES = (
         ('programada', 'Programada'),
-        ('completada', 'Completada'),
+        ('asistida', 'Asistida'),
         ('cancelada', 'Cancelada'),
+        ('inasistida', 'No Asistió'),
     )
 
     MOTIVO_CHOICES = (
@@ -163,6 +164,13 @@ class Cita(models.Model):
         is_new = self.pk is None
         super().save(*args, **kwargs)
         self.actualizar_disponibilidad(is_new)
+        self.actualizar_estado_por_fecha()
+
+
+    def actualizar_estado_por_fecha(self):
+        if self.fecha_hora.fecha < timezone.now().date() and self.estado == 'programada':
+            self.estado = 'inasistida'
+            self.save()
 
     def actualizar_disponibilidad(self, is_new):
         print(f"Actualizando disponibilidad para fecha_hora: {self.fecha_hora}")
