@@ -8,4 +8,6 @@ urlpatterns = [
     path('base/', views.base, name="base"),
     path('loginregister/', views.registrarme, name="loginregister"),
     path('acceso-denegado/', views.acceso_denegado, name='acceso_denegado'),
+    path('cuidados/', views.cuidados, name='cuidados'),
+    path('about/', views.about, name='about'),
 ]

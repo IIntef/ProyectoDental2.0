@@ -4,16 +4,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laboratorio Dental</title>
+  <title>{% block titulo %}Laboratorio Dental{% endblock %}</title>
+  {% block css %}
+  {% endblock %}
   <link rel="stylesheet" href="{% static '/css/inicio.css' %}"/>
+  
 </head>
 <body>
   <header>
     <img src="{% static 'img\logo.png' %}" alt="Diente, Logo del laboratorio" title="Logo">
     <h1>LABORATORIO DENTAL</h1>
   </header>
-
+  {% block content %}
   <main>
+    
     <div class="content">
       <div class="welcome-box">
         <h2>BIENVENIDO AL LABORATORIO DENTAL - SANDRA GAVIRIA</h2>
@@ -24,8 +28,12 @@
         </div>
       </div>
     </div>
+    
   </main>
+  {% endblock %}
   <script type="module" src="{% static 'js/inicio.js' %}"></script>
+  {% block js %}
+  {% endblock %}
 </body>
 </html>
 

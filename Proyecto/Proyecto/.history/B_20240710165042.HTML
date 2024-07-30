@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirección a Redes Sociales</title>
+    <style>
+        /* Estilos opcionales para los enlaces */
+        .social-link {
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Redirección a Redes Sociales</h1>
+
+    <p>Presiona los botones para ir a las redes sociales:</p>
+
+    <a href="https://www.facebook.com/tupagina" class="social-link" onclick="openInNewTab('https://www.facebook.com/tupagina'); return false;">Facebook</a>
+    <a href="https://twitter.com/tupagina" class="social-link" onclick="openInNewTab('https://twitter.com/tupagina'); return false;">Twitter</a>
+    <a href="https://www.instagram.com/tupagina" class="social-link" onclick="openInNewTab('https://www.instagram.com/tupagina'); return false;">Instagram</a>
+    <a href="https://www.linkedin.com/company/tupagina" class="social-link" onclick="openInNewTab('https://www.linkedin.com/company/tupagina'); return false;">LinkedIn</a>
+
+    <script>
+        function openInNewTab(url) {
+            var width = 600;
+            var height = 400;
+            var left = (screen.width - width) / 2;
+            var top = (screen.height - height) / 2;
+
+            window.open(url, '_blank', `toolbar=yes,scrollbars=yes,resizable=yes,top=${top},left=${left},width=${width},height=${height}`);
+        }
+    </script>
+
+</body>
+</html>

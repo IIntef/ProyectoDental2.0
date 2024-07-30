@@ -1,0 +1,99 @@
+{% extends "inicio.html" %}
+{% load static %}
+{% block titulo %}Cuidados{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+    <link rel="stylesheet" href="{% static '/css/cuidados.css' %}?v1.2"/>
+    {% endblock %}
+    {% block content %}
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <div class="product-content">
+                    <div class="product-img">
+                        <img src="{% static '/img/protesis.jpg' %}" alt="Protesis">
+                    </div>
+                    <div class="product-txt">
+                        <h3>Cuidados Para Prótesis:</h3><br>
+                        <p>
+                            1. Lavar con jabón líquido neutro con cepillo de cerdas firmes.<br><br>
+                            2. Utilizar pastilla efervescente para limpieza de prótesis (Corega Tabs).<br><br>
+                            3. No lavar con crema dental.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="product-img">
+                    <img src="{% static '/img/bucal.avif' %}" alt="Bucal">
+                </div>
+                <div class="product-content">
+                    <div class="product-txt">
+                        <h3>Cuidado Bucal:</h3>
+                        <p>
+                          1. Lavar la boca con crema dental y utilizar enjuague bucal.<br><br>
+                          2. Si el paciente es edéntulo (sin dientes naturales en la boca) 
+                          debe cepillar lengua y paredes con cepillo de cerda suave y la encía
+                         limpiarla con algodón húmedo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="product-content">
+                    <div class="product-img">
+                        <img src="{% static '/img/recomendacion.jpg' %}" alt="Recomendación">
+                    </div>
+                    <div class="product-txt">
+                        <h3>Recomendaciones:</h3>
+                        <p>
+                          1. Para adaptación se recomienda comenzar con dieta blanda.<br><br>
+                          2. Consumir líquidos, gelatinas.<br><br>
+                          3. Retirar la prótesis en la noche, lavarla y 
+                          mantenerla seca en un recipiente porta-prótesis.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="product-content">
+                    <div class="product-img">
+                        <img src="{% static '/img/retenedor.jpg' %}" alt="Retenedor" style="margin-top: 50px; ">
+                    </div>
+                    <div class="product-txt">
+                        <h3>Retenedores-post Ortodoncia:</h3>
+                        <p>
+                          1. Arco Continuo.<br><br>
+                          2. Placas Acetato.                
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="product-content">
+                    <div class="product-img">
+                        <img src="{% static '/img/retencion.jpg' %}" alt="Retención"  width="250px">
+                    </div>
+                    <div class="product-txt">
+                        <h3>La fase de retención dental:</h3>
+                        <p>
+                          Es la última fase del tratamiento de ortodoncia, sirve para evitar
+                          que los dientes vuelvan a la posición inicial. Por tal motivo, 
+                          los retenedores se deben utilizar inmediatamente después de retirar los brackets.
+                           El primer año los debe usar 24/7 del segundo año en adelante en la noche.<br>
+                            1. No se usan para comer.<br>
+                            2. Debe lavarlos con cepillo suave y jabón líquido.<br>
+                            3. Utilizar un portaretenedor cuando no lo uses.<br>
+                            4. No agua caliente.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    {% block js %}
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+    <script src="{% static '/js/cuidados.js' %}"></script>
+    {% endblock %}

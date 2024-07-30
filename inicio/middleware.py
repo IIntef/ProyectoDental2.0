@@ -19,6 +19,8 @@ class LoginRequiredMiddleware:
                 reverse('password_reset_done'),
                 reverse('password_reset_complete'),
                 reverse('acceso_denegado'),
+                reverse('about'),
+                reverse('cuidados'),
             ]
         except NoReverseMatch:
             # Manejo de excepción si alguna URL no se puede resolver
