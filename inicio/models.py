@@ -48,6 +48,9 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=50)
     imagen = models.ImageField(upload_to='imagenes/', blank=True, null=True)
     direccion = models.CharField(max_length=100, null=True, blank=True)
+    
+    
+    
     email = models.EmailField(max_length=100, null=True, blank=True, unique=True)
     ocupacion = models.CharField(max_length=50, null=True, blank=True)
     celular = models.CharField(max_length=15, null=True, blank=True)  # Changed to CharField

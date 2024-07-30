@@ -33,8 +33,11 @@ def correo(request):
 
 @login_required(login_url='acceso_denegado')
 def calendario(request):
-    citas = Cita.objects.filter(paciente=request.user)
-    for cita in citas:
-        print(f"Evento: {cita.paciente.username}, Fecha y hora: {cita.fecha_hora.fecha} {cita.fecha_hora.hora}")
-        
+    if request.user.is_superuser:
+        # Si es superusuario, obtener todas las citas programadas
+        citas = Cita.objects.filter(estado='programada')
+    else:
+        # Si es un paciente normal, obtener solo sus citas programadas
+        citas = Cita.objects.filter(paciente=request.user, estado='programada')
+    
     return render(request, 'calendario.html', {'citas': citas})

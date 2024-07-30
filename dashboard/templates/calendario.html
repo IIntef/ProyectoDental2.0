@@ -3,45 +3,35 @@
 {% load static %}
 
 {% block extra_css %}
-    <!-- FullCalendar CSS -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block titulo %}
-    <title>Calendario</title>
+Calendario de Citas Programadas
 {% endblock %}
 
 {% block content %}
-    <h1>Calendario</h1>
     <div id="calendar"></div>
+    <script id="citas-data" type="application/json">
+        [
+            {% for cita in citas %}
+                {
+                    "paciente": "{{ cita.paciente.username }}",
+                    "motivo": "{{ cita.motivo }}",
+                    "start": "{{ cita.fecha_hora.fecha|date:"Y-m-d" }}T{{ cita.fecha_hora.hora|date:"H:i:s" }}",
+                    "end": "{{ cita.fecha_hora.fecha|date:"Y-m-d" }}T{{ cita.fecha_hora.hora|date:"H:i:s" }}"
+                }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    </script>
+    <script id="is-superuser" type="application/json">
+        {{ user.is_superuser|yesno:"True,False" }}
+    </script>
 {% endblock %}
 
 {% block extra_js %}
     <script src="{% static 'js/busqueda.js' %}"></script>
-    <!-- FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                events: [
-                    {% for cita in citas %}
-                    {
-                        title: '{{ cita.paciente.username }}: {{ cita.motivo }}',
-                        start: '{{ cita.fecha_hora.fecha|date:"Y-m-d" }}T{{ cita.fecha_hora.hora|date:"H:i:s" }}',
-                        end: '{{ cita.fecha_hora.fecha|date:"Y-m-d" }}T{{ cita.fecha_hora.hora|date:"H:i:s" }}',
-                        backgroundColor: ({{ cita.estado|lower }} == 'cancelada') ? 'red' : 'blue',
-                        borderColor: ({{ cita.estado|lower }} == 'cancelada') ? 'darkred' : 'darkblue',
-                        textColor: 'white'
-                    },
-                    {% endfor %}
-                ],
-                // Puedes añadir más opciones aquí si es necesario
-            });
-
-            calendar.render();
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/es.js"></script>
+    <script src="{% static 'js/calendario.js' %}"></script>
 {% endblock %}
