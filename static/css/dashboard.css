@@ -1,138 +1,182 @@
 @import url('https://fonts.googleapis.com/css?family=Fredoka One');
 
-.content{
+.content {
   width: 100%;
   padding: 0;
   background-color: #D9D9D9;
 }
 
-main{
+main {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  min-height: 80vh;
+}
+
+.botones {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
   width: 100%;
 }
 
-.recordatorio{
-  width: 40%;
-  max-width: 750px;
-  height: 80vh;;
+.botonesdos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+  padding: 20px;
+}
+
+.boton1 {
   display: flex;
   flex-direction: column;
-  background-color: #CAB97D;
-  justify-content: center;
-  align-items: center;
+  flex: 1 1 300px;
+  margin: 10px;
 }
 
-.agenda{
-  background-color: #232323;
-  width: 100%;
-  height: 50%;
-}
-
-.citas{
-  background-color: #e40c0c;
-  width: 100%;
-  height: 50%;
-}
-
-.boton{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.botones{
-  width: 60%;
-  height: 80vh;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-  padding-top: 25px;
-}
-
-.botonesdos{
-  width: 88%;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.boton1, .boton2, a{
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.botonesdos a{
+.botonesdos a {
   color: white;
   text-decoration: none;
-  display: flex;
-  margin: 10px;
   display: flex;
   background-color: #CAB97D;
   border-radius: 10px;
   align-items: center;
   flex: 1;
   text-align: center;
-  padding: 10px;
+  padding: 20px;
   justify-content: center;
-  height: 13vw;
-  max-height: 90px;
+  margin-bottom: 20px;
+  min-height: 100px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.boton i{
+.boton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.boton i {
   font-size: clamp(1.1rem, 2vw, 1.3rem);
-  margin: 0 15px 0 10px;
   color: white;
   background-color: rgba(212, 194, 149, 1);
   padding: 10px 12px;
   border-radius: 100%;
+  display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
 }
 
-.text{
-  position: relative;
+.text {
+  flex: 1;
   text-align: left;
-  padding: 0;
-  margin-right: 10px;
+  padding-right: 10px;
 }
 
-.text p, h3{
+.text p, .text h3 {
   color: white;
   margin: 0;
   padding: 0;
 }
 
-.text p{
+.text p {
   font-size: clamp(0.5rem, 2vw, 0.7rem);
 }
 
-.text h3{
+.text h3 {
   font-size: clamp(0.5rem, 2vw, 1rem);
 }
 
-.boton hr{
+.boton hr {
   border: 0.5px solid white;
-  margin: 0;
-  height: 6vw;
-  max-height: 40px;
+  margin: 0 10px;
+  height: 40px;
 }
 
-.boton .text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+@media (max-width: 768px) {
+  main {
+    min-height: 80vh;
+    height: 80vh;
+    overflow-y: auto;
+  }
+
+  .botonesdos {
+    padding: 10px;
+  }
+
+  .boton1 {
+    flex: 1 1 100%;
+    margin: 5px;
+  }
+  
+  .botonesdos a {
+    flex-direction: row;
+    text-align: left;
+    padding: 10px;
+    min-height: 60px;
+    margin-bottom: 10px;
+  }
+  
+  .boton {
+    flex-direction: row;
+  }
+  
+  .text {
+    padding-right: 5px;
+  }
+  
+  .boton hr {
+    height: 30px;
+  }
+  
+  .boton i {
+    font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+    padding: 8px 10px;
+  }
+
+  .text p {
+    font-size: clamp(0.4rem, 1.5vw, 0.6rem);
+  }
+
+  .text h3 {
+    font-size: clamp(0.5rem, 1.8vw, 0.9rem);
+  }
 }
 
-.boton .icon {
-  font-size: 1.5em;
-}
+@media (max-height: 600px) and (max-width: 768px) {
+  .botonesdos {
+    padding: 5px;
+  }
+  
+  .boton1 {
+    margin: 3px;
+  }
+  
+  .botonesdos a {
+    padding: 5px;
+    min-height: 50px;
+    margin-bottom: 6px;
+  }
+  
+  .boton i {
+    font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+    padding: 6px 8px;
+  }
 
-.returnhome{
-  width: 100%;
+  .text p {
+    font-size: clamp(0.3rem, 1.2vw, 0.5rem);
+  }
+
+  .text h3 {
+    font-size: clamp(0.4rem, 1.5vw, 0.7rem);
+  }
+
+  .boton hr {
+    height: 25px;
+    margin: 0 5px;
+  }
 }
