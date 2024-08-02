@@ -33,3 +33,8 @@
   text-decoration: none;
   cursor: pointer;
 }
+
+.btn-custom {
+  text-transform: capitalize; 
+  font-size: 1.05rem; 
+}

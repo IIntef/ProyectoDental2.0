@@ -1,87 +1,103 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/elementos.css' %}?v1.2">
+{% endblock %}
+
+{% block titulo %}
+Pacientes Registrados
+{% endblock %}
+
 {% block content %}
-    <div class="card">
-        <div class="card-header">
-            <a class="btn btn-success" href="{% url 'crearcuentas' %}" role="button">Agregar Nuevo Paciente</a>
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <a class="btn btn-primary btn-custom" href="{% url 'dashboard' %}" role="button">
+            <i class="fas fa-arrow-left text-white"></i> Volver
+        </a>
+        <a class="btn btn-success btn-custom" href="{% url 'crearcuentas' %}" role="button">
+            <i class="fas fa-plus text-white"></i> Agregar Nuevo Paciente
+        </a>
+    </div>
+    <div class="card-body">
+        <!-- Filtros -->
+        <div class="mb-3">
+            <select id="tipoDocumentoFilter" class="form-select">
+                <option value="">Todos los tipos de documento</option>
+                <option value="C.C">Cédula de Ciudadanía</option>
+                <option value="T.I">Tarjeta de Identidad</option>
+                <option value="C.E">Cédula de Extranjería</option>
+                <option value="C.I">Carnet de Identidad</option>
+            </select>
         </div>
-        <div class="card-body">
-            <h4 class="card-title">Pacientes Registrados</h4>
 
-            <!-- Filtros -->
-            <div class="mb-3">
-                <select id="tipoDocumentoFilter" class="form-select">
-                    <option value="">Todos los tipos de documento</option>
-                    <option value="C.C">Cédula de Ciudadanía</option>
-                    <option value="T.I">Tarjeta de Identidad</option>
-                    <option value="C.E">Cédula de Extranjería</option>
-                    <option value="C.I">Carnet de Identidad</option>
-                </select>
-            </div>
-            
-            <div class="mb-3">
-                <input type="text" id="searchInput" class="form-control" placeholder="Buscar paciente...">
-            </div>
+        <div class="mb-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="Buscar paciente...">
+        </div>
 
-            <div class="table-responsive">
-                <table id="patientTable" class="table table-primary">
-                    <thead>
-                        <tr>
-                            <th scope="col">Id</th>
-                            <th scope="col">Tipo Documento</th>
-                            <th scope="col">No. Documento</th>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Imagen</th>
-                            <th scope="col">E-mail</th>
-                            <th scope="col">Dirección</th>
-                            <th scope="col">Edad</th>
-                            <th scope="col">Ocupación</th>
-                            <th scope="col">Celular</th>
-                            <th scope="col">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for cuenta in cuentas %}
-                        {% if not cuenta.is_superuser %}
-                        <tr>
-                            <td>{{ cuenta.id }}</td>
-                            <td>{{ cuenta.get_tipo_display }}</td>
-                            <td>{{ cuenta.numero }}</td>
-                            <td>{{ cuenta.username }}</td>
-                            <td>{% if cuenta.imagen %}
-                                <img src="{{ cuenta.imagen.url }}" alt="Imagen de cuenta" width="100px" height="100px" style="object-fit: cover; object-position: center;"> 
+        <div class="table-responsive">
+            <table id="patientTable" class="table table-primary">
+                <thead>
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Tipo Documento</th>
+                        <th scope="col">No. Documento</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Imagen</th>
+                        <th scope="col">E-mail</th>
+                        <th scope="col">Dirección</th>
+                        <th scope="col">Edad</th>
+                        <th scope="col">Ocupación</th>
+                        <th scope="col">Celular</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cuenta in cuentas %}
+                    {% if not cuenta.is_superuser %}
+                    <tr>
+                        <td>{{ cuenta.id }}</td>
+                        <td>{{ cuenta.get_tipo_display }}</td>
+                        <td>{{ cuenta.numero }}</td>
+                        <td>{{ cuenta.username }}</td>
+                        <td>{% if cuenta.imagen %}
+                            <img src="{{ cuenta.imagen.url }}" alt="Imagen de cuenta" width="100px" height="100px"
+                                style="object-fit: cover; object-position: center;">
                             {% else %}
-                                <p>No hay imagen disponible</p>
-                            {% endif %}</td>
-                            <td>{{ cuenta.email }}</td>  
-                            <td>{{ cuenta.direccion }}</td>
-                            <td>{{ cuenta.edad }}</td>
-                            <td>{{ cuenta.ocupacion }}</td>
-                            <td>{{ cuenta.celular }}</td> 
-                            <td>    
-                                <a class="btn btn-info" href="{% url 'editarcuentas' cuenta.id %}" role="button">Editar</a>
-                                <button class="btn btn-danger" onclick="confirmarEliminacion('{{ cuenta.id }}', '{{ cuenta.username }}', '{{ cuenta.numero }}')">Borrar</button>
-                            </td>                            
-                        </tr>
-                        {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <a class="btn btn-primary" href="{% url 'dashboard' %}" role="button">Volver</a>
+                            <p>No hay imagen disponible</p>
+                            {% endif %}
+                        </td>
+                        <td>{{ cuenta.email }}</td>
+                        <td>{{ cuenta.direccion }}</td>
+                        <td>{{ cuenta.edad }}</td>
+                        <td>{{ cuenta.ocupacion }}</td>
+                        <td>{{ cuenta.celular }}</td>
+                        <td>
+                            <a class="btn btn-info" href="{% url 'editarcuentas' cuenta.id %}" role="button">Editar</a>
+                            <button class="btn btn-danger"
+                                onclick="confirmarEliminacion('{{ cuenta.id }}', '{{ cuenta.username }}', '{{ cuenta.numero }}')">Borrar</button>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <!-- Modal de confirmación -->
-    <div id="confirmarModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="cerrarModal()">&times;</span>
-            <p>¿Estás seguro de que deseas eliminar la cuenta de <strong id="historiaUsername"></strong> (Número: <strong id="historiaNumero"></strong>)?</p>
-            <form id="formEliminar" method="POST" action="">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Eliminar</button>
-                <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
-            </form>
-        </div>
+<!-- Modal de confirmación -->
+<div id="confirmarModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="cerrarModal()">&times;</span>
+        <p>¿Estás seguro de que deseas eliminar la cuenta de <strong id="historiaUsername"></strong> (Número: <strong
+                id="historiaNumero"></strong>)?</p>
+        <form id="formEliminar" method="POST" action="">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Eliminar</button>
+            <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+        </form>
     </div>
+</div>
 {% endblock %}

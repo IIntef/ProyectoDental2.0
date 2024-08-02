@@ -1,0 +1,145 @@
+/* Estilos generales */
+.card-header .d-flex {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-custom {
+  white-space: nowrap;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.9rem;
+  width: auto;
+}
+
+.input-group {
+  width: auto;
+  flex: 0 1 auto;
+}
+
+#searchInput, #estadoFilter {
+  height: 38px;
+  font-size: 0.9rem;
+}
+
+/* Estilos para la barra de búsqueda y filtro */
+.input-group-text {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+}
+
+.input-group-text i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.form-control:focus, .form-select:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+}
+
+/* Centrando la tabla */
+.table-centered {
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .card-header .d-flex {
+      flex-direction: column;
+      align-items: stretch;
+  }
+
+  .btn-custom, .input-group {
+      width: 100%;
+      margin-bottom: 0.5rem;
+  }
+}
+
+.custom-select-wrapper {
+  position: relative;
+}
+
+.custom-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: transparent;
+  padding-right: 2rem;
+  cursor: pointer;
+}
+
+.custom-select::-ms-expand {
+  display: none;
+}
+
+.custom-select-trigger {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 2.5rem;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  border-left: none;
+}
+
+.custom-select-trigger i {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Estilos para los controles de paginación */
+.pagination-controls {
+  font-size: 0.9rem;
+}
+
+.pagination a {
+  text-decoration: none;
+  color: #007bff;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+}
+
+.page-link {
+  text-decoration: none;
+  color: #007bff;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+}
+
+.pagination a.disabled {
+  color: #6c757d;
+  pointer-events: none;
+  border-color: #ced4da;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.show-items {
+  display: flex;
+  align-items: center;
+}
+
+.show-items select {
+  margin: 0 0.5rem;
+}
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto; /* Alinea la paginación a la derecha */
+}

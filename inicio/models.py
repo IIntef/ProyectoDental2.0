@@ -48,9 +48,6 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=50)
     imagen = models.ImageField(upload_to='imagenes/', blank=True, null=True)
     direccion = models.CharField(max_length=100, null=True, blank=True)
-    
-    
-    
     email = models.EmailField(max_length=100, null=True, blank=True)
     ocupacion = models.CharField(max_length=50, null=True, blank=True)
     celular = models.CharField(max_length=15, null=True, blank=True)  # Changed to CharField
@@ -124,7 +121,19 @@ class Inventario(models.Model):
     )
     producto = models.CharField(max_length=150, blank=True) 
     cantidad = models.FloatField(blank=True) 
-    estado = models.PositiveSmallIntegerField(choices=ESTADO)
+    estado = models.PositiveSmallIntegerField(choices=ESTADO, default=1)
+
+    def save(self, *args, **kwargs):
+        # Actualiza el estado basado en la cantidad
+        if self.cantidad <= 0:
+            self.estado = 2  # 'Agotado'
+        else:
+            self.estado = 1  # 'Disponible'
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.producto
+    
 
 class Fecha(models.Model):
     fecha = models.DateField()
